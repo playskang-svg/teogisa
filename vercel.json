@@ -1,13 +1,10 @@
 {
-  "version": 2,
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
   "framework": "nextjs",
   "cleanUrls": true,
   "crons": [
     {
       "path": "/api/cron",
-      "schedule": "*/30 * * * *"
+      "schedule": "0 21 * * *"
     }
   ],
   "headers": [

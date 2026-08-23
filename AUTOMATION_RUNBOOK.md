@@ -6,13 +6,23 @@
 
 | 경로 | 실행 주체 | 주기 | 비고 |
 | --- | --- | --- | --- |
-| Cloudflare cron 트리거 | `worker/index.ts`의 `scheduled()` | 30분 | 배포 환경에 cron 트리거가 등록된 경우에만 동작합니다. |
-| 사이트 요청 따라잡기 | `worker/index.ts`의 `fetch()` | 최소 15분 간격 | cron이 없어도 방문·크롤러 요청이 밀린 작업을 처리합니다. |
-| 외부 스케줄러 호출 | `GET/POST /api/cron` | 호출한 주기 | Vercel Cron, 업타임 모니터, 사내 배치에서 호출합니다. |
+| Vercel Cron | `vercel.json` 의 `crons` → `/api/cron` | 하루 1회 (06:00 KST) | **Hobby 요금제는 하루 1회만 허용**합니다. 더 잦은 표현식을 쓰면 배포가 거부됩니다. |
+| 요청 따라잡기 | `proxy.ts` → `/api/cron` | 최소 15분 간격 | **평소 주기는 사실상 이 경로가 결정합니다.** 요청의 20%만 표본으로 깨우고, 실제 실행 여부는 실행권으로 판단합니다. |
+| 수동 실행 | 관리자 화면 · `POST /api/cron` | 즉시 | 점검과 복구용입니다. |
 
 세 경로 모두 같은 진입점(`runScheduledOrganizationActivities`)을 사용합니다. 실행권은 D1의 조건부 갱신으로 한 번에 하나만 잡히므로 경로가 겹쳐도 중복 실행되지 않습니다.
 
 ## 2. 필요한 환경값
+
+| 변수 | 만드는 법 |
+| --- | --- |
+| `DATABASE_URL` | Supabase → Connect → Connection string → **Transaction pooler**(6543). `[YOUR-PASSWORD]` 를 실제 비밀번호로 교체합니다. |
+| `CRON_SECRET` | 임의의 난수 문자열. `openssl rand -base64 32` |
+| `ADMIN_SESSION_SECRET` | 임의의 난수 문자열. `openssl rand -base64 32` |
+| `ADMIN_USERNAME` | 관리자 로그인 아이디. 직접 정합니다. |
+| `ADMIN_PASSWORD_HASH` | `npm run admin:hash` 로 생성합니다. 비밀번호 원문은 저장하지 않습니다. |
+
+환경변수는 배포 시점에 주입됩니다. **값을 추가하거나 바꾼 뒤에는 반드시 재배포해야 반영됩니다.**
 
 - `CRON_SECRET`: `/api/cron` 호출용 비밀값. 설정하지 않으면 관리자 세션으로만 호출할 수 있습니다.
 

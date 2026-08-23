@@ -1,4 +1,3 @@
-import { env } from "cloudflare:workers";
 import { headers } from "next/headers";
 
 const COOKIE_NAME = "rr_admin_session";
@@ -8,7 +7,7 @@ const encoder = new TextEncoder();
 type AdminEnvironment = { ADMIN_USERNAME?:string; ADMIN_PASSWORD_HASH?:string; ADMIN_SESSION_SECRET?:string };
 type SessionPayload = { username:string; expiresAt:number };
 
-function settings(){return env as unknown as AdminEnvironment;}
+function settings(){return process.env as AdminEnvironment;}
 function bytesToBase64Url(bytes:Uint8Array){let binary="";for(const byte of bytes)binary+=String.fromCharCode(byte);return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/g,"");}
 function base64UrlToBytes(value:string){const padded=value.replace(/-/g,"+").replace(/_/g,"/").padEnd(Math.ceil(value.length/4)*4,"=");const binary=atob(padded);return Uint8Array.from(binary,char=>char.charCodeAt(0));}
 function safeEqual(left:Uint8Array,right:Uint8Array){if(left.length!==right.length)return false;let difference=0;for(let i=0;i<left.length;i++)difference|=left[i]^right[i];return difference===0;}

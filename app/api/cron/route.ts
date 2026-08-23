@@ -1,4 +1,3 @@
-import { env } from "cloudflare:workers";
 import { getAutomationSchedulerStatus, runScheduledOrganizationActivities } from "../../../lib/repository";
 import { getAdminSession } from "../../../lib/site-admin";
 
@@ -7,8 +6,7 @@ import { getAdminSession } from "../../../lib/site-admin";
  * Cloudflare cron 트리거가 없는 환경에서도 이 주소만 주기적으로 호출하면 자동화가 유지됩니다.
  */
 function cronSecret() {
-  const bindings = env as unknown as { CRON_SECRET?: string };
-  return bindings.CRON_SECRET || process.env.CRON_SECRET || "";
+  return process.env.CRON_SECRET || "";
 }
 
 function safeEqual(left: string, right: string) {

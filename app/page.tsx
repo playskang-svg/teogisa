@@ -6,6 +6,10 @@ import { ArticleThumbnail } from "./components/ArticleMedia";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "../lib/site";
 import { toolCatalog } from "../lib/portal";
 
+// 자동화가 발행한 글이 재배포 없이 반영되어야 합니다.
+// 기존 Cloudflare 엣지 캐시(s-maxage=300)와 같은 주기로 재생성합니다.
+export const revalidate = 300;
+
 export const metadata: Metadata = {
   title: "퇴직 후 생활비·지원제도·새 수입 가이드",
   description: SITE_DESCRIPTION,
