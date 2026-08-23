@@ -60,6 +60,7 @@ export const toolCatalog = [
   { href:"/tools/image-converter", title:"이미지 변환기", description:"사진을 WebP·JPG·PNG로 바꾸고 용량을 줄이는 도구입니다.", status:"준비 중" },
   { href:"https://myreceipt.adbles.com/", title:"영수증 정리도우미", description:"영수증 사진을 여러 장 올리면 금액을 합산하고 A4 크기의 정리 PDF로 저장합니다.", status:"사용 가능" },
   { href:"https://proshot.adbles.com/", title:"ProShot AI 사진 스튜디오", description:"휴대폰 셀카 한 장으로 깔끔한 증명사진·비즈니스 헤드샷·스튜디오 프로필을 무료로 만듭니다.", status:"사용 가능" },
+  { href:"https://jeakyung-preview.vercel.app/", title:"비포 스토리", description:"비포 스토리 사이트로 이동해 현재 제공 중인 서비스를 직접 확인할 수 있습니다.", status:"사용 가능" },
   { href:"/tools/thumbnail-maker", title:"블로그 썸네일 만들기", description:"제목과 색상을 선택해 검색용 썸네일을 만듭니다.", status:"준비 중" },
 ] as const;
 
