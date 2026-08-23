@@ -544,3 +544,57 @@ test("schedules every member with auditable hourly or daily work", async () => {
   assert.match(document, /직원 33명 전원/);
   assert.match(document, /발행, 외부 채널 게시, 운영 배포/);
 });
+
+test("keeps the organization automation scheduler running without an external cron", async () => {
+  const [repository, worker, cronRoute, automationRoute, admin, css, vercel, runbook] = await Promise.all([
+    readFile(new URL("../lib/repository.ts", import.meta.url), "utf8"),
+    readFile(new URL("../worker/index.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/cron/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/automation/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/admin/AdminClient.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+    readFile(new URL("../vercel.json", import.meta.url), "utf8"),
+    readFile(new URL("../AUTOMATION_RUNBOOK.md", import.meta.url), "utf8"),
+  ]);
+
+  // 한쪽 실패가 다른 자동화를 멈추지 않아야 합니다.
+  assert.match(repository, /errors\.push\(`콘텐츠 에이전트/);
+  assert.match(repository, /errors\.push\(`구성원 실행계획/);
+  // next_run_at이 비어 실행 조건에 걸리지 않는 항목을 되살립니다.
+  assert.match(repository, /reviveStalledAutomation/);
+  assert.match(repository, /UPDATE content_agents SET next_run_at=\?,updated_at=CURRENT_TIMESTAMP WHERE status='active' AND next_run_at IS NULL/);
+  assert.match(repository, /UPDATE member_activity_plans SET next_run_at=\?,updated_at=CURRENT_TIMESTAMP WHERE status='active' AND next_run_at IS NULL/);
+  // 실행권은 한 번에 하나만 잡혀야 중복 실행이 생기지 않습니다.
+  assert.match(repository, /runAutomationTickIfDue/);
+  assert.match(repository, /WHERE site_settings\.value_json<=\?/);
+  assert.match(repository, /getAutomationSchedulerStatus/);
+  assert.match(repository, /AUTOMATION_TICK_INTERVAL_MINUTES=15/);
+
+  // cron 트리거가 없는 환경에서도 일반 요청이 밀린 작업을 따라잡습니다.
+  assert.match(worker, /shouldCatchUpAutomation/);
+  assert.match(worker, /ctx\.waitUntil\(runAutomationTickIfDue\("request"\)/);
+  assert.match(worker, /runScheduledOrganizationActivities\("cron"\)/);
+
+  // 외부 스케줄러 입구는 비밀값이나 관리자 세션이 있어야 합니다.
+  assert.match(cronRoute, /CRON_SECRET/);
+  assert.match(cronRoute, /getAdminSession/);
+  assert.match(cronRoute, /status: 401/);
+  assert.match(cronRoute, /export async function GET/);
+  assert.match(cronRoute, /export async function POST/);
+  assert.match(vercel, /"path": "\/api\/cron"/);
+  assert.match(vercel, /"schedule": "\*\/30 \* \* \* \*"/);
+
+  // 관리자 화면에서 상태 확인과 즉시 실행이 가능해야 합니다.
+  assert.match(automationRoute, /action === "run-scheduler"/);
+  assert.match(automationRoute, /scheduler: await getAutomationSchedulerStatus\(\)/);
+  assert.match(admin, /지금 자동화 실행/);
+  assert.match(admin, /자동화 정지 감지/);
+  assert.match(css, /\.scheduler-status\{/);
+  assert.match(runbook, /\/api\/cron/);
+
+  // 실패한 에이전트가 한정된 실행 슬롯을 독차지하면 정상 에이전트가 영원히 실행되지 못합니다.
+  assert.match(repository, /AGENT_RETRY_BACKOFF_MINUTES=60/);
+  assert.match(repository, /UPDATE content_agents SET next_run_at=\?,updated_at=CURRENT_TIMESTAMP WHERE id=\?/);
+  // 품질 게이트 실패 사유는 어떤 기준이 모자란지 수치로 남겨야 합니다.
+  assert.match(repository, /본문 \$\{plain\.length\}자\/최소 900자/);
+});

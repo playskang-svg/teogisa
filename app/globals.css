@@ -774,6 +774,21 @@ button:not(:disabled),[role="button"],summary{cursor:pointer}
 }
 
 .release-governance-panel{grid-column:1/-1;border-top:4px solid var(--navy)}
+.scheduler-status{margin:-6px 0 24px;padding:18px;border:1px solid var(--line);border-left:4px solid var(--teal);background:var(--mist)}
+.scheduler-status.stopped{border-left-color:var(--orange);background:#fff4ea}
+.scheduler-status.unknown{border-left-color:var(--line)}
+.scheduler-status header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.scheduler-status header span{display:block;color:var(--teal);font-size:11px;font-weight:800}
+.scheduler-status.stopped header span{color:var(--orange)}
+.scheduler-status header strong{display:block;margin-top:5px;color:var(--navy);font-size:13px}
+.scheduler-status dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0 0}
+.scheduler-status dl>div{padding:12px;border:1px solid var(--line);background:#fff}
+.scheduler-status dt{color:var(--muted-ink);font-size:10px;font-weight:800}
+.scheduler-status dd{margin:6px 0 0;color:var(--navy);font-size:12px;font-weight:700}
+.scheduler-status .scheduler-error{margin:14px 0 0;padding:10px;background:#fdeceb;color:#93321f;font-size:11px;line-height:1.6}
+.scheduler-status .scheduler-help{margin:14px 0 0;color:var(--muted-ink);font-size:11px;line-height:1.7}
+.scheduler-status code{padding:1px 5px;background:#fff;font-size:11px}
+@media(max-width:900px){.scheduler-status dl{grid-template-columns:1fr}}
 .member-activity-panel{grid-column:1/-1;border-top:4px solid var(--teal)}
 .activity-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0}
 .activity-summary article{padding:18px;border:1px solid var(--line);background:var(--mist)}

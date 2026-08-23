@@ -1,7 +1,7 @@
 /** Cloudflare Worker entry point for the vinext-starter template. */
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
-import { runScheduledOrganizationActivities } from "../lib/repository";
+import { runAutomationTickIfDue, runScheduledOrganizationActivities } from "../lib/repository";
 
 interface Env {
   ASSETS: Fetcher;
@@ -35,6 +35,17 @@ function isPublicDocumentRequest(request:Request,url:URL){
   if(url.pathname.startsWith("/admin")||url.pathname.startsWith("/api/")||url.pathname.startsWith("/_vinext/"))return false;
   if(request.headers.has("cookie")||request.headers.has("rsc")||request.headers.has("next-router-state-tree"))return false;
   return request.headers.get("accept")?.includes("text/html")===true;
+}
+
+function logAutomationFailure(source:string,error:unknown){console.error(JSON.stringify({event:"scheduled_organization_activity_failed",source,message:error instanceof Error?error.message:String(error)}));}
+
+// Cron 트리거가 등록되지 않은 환경에서도 자동화가 멈추지 않도록, 일반 요청에서도
+// 밀린 작업을 따라잡습니다. 실제 실행은 D1 실행권을 잡은 요청 하나만 수행하고
+// 응답 이후에 처리되므로 사용자 응답 속도에는 영향을 주지 않습니다.
+function shouldCatchUpAutomation(request:Request,url:URL){
+  if(request.method!=="GET"&&request.method!=="HEAD")return false;
+  if(url.pathname.startsWith("/_vinext/")||url.pathname.startsWith("/api/cron"))return false;
+  return !url.pathname.includes(".");
 }
 
 function cacheKey(url:URL){return new Request(`${url.origin}${url.pathname}`,{headers:{accept:"text/html"}});}
@@ -81,6 +92,8 @@ const worker = {
       }, allowedWidths);
     }
 
+    if(shouldCatchUpAutomation(request,url))ctx.waitUntil(runAutomationTickIfDue("request").catch(error=>logAutomationFailure("request",error)));
+
     const cacheable=isPublicDocumentRequest(request,url);
     // Sites preview/runtime variants may not expose the Cache API. Caching is
     // therefore an optimization, never a requirement for serving the page.
@@ -103,7 +116,7 @@ const worker = {
     }
     return response;
   },
-  async scheduled(_controller:ScheduledController,_env:Env,ctx:ExecutionContext){ctx.waitUntil(runScheduledOrganizationActivities().catch(error=>console.error(JSON.stringify({event:"scheduled_organization_activity_failed",message:error instanceof Error?error.message:String(error)}))));},
+  async scheduled(_controller:ScheduledController,_env:Env,ctx:ExecutionContext){ctx.waitUntil(runScheduledOrganizationActivities("cron").catch(error=>logAutomationFailure("cron",error)));},
 };
 
 export default worker;
