@@ -14,6 +14,16 @@
 
 ## 2. 필요한 환경값
 
+| 변수 | 만드는 법 |
+| --- | --- |
+| `DATABASE_URL` | Supabase → Connect → Connection string → **Transaction pooler**(6543). `[YOUR-PASSWORD]` 를 실제 비밀번호로 교체합니다. |
+| `CRON_SECRET` | 임의의 난수 문자열. `openssl rand -base64 32` |
+| `ADMIN_SESSION_SECRET` | 임의의 난수 문자열. `openssl rand -base64 32` |
+| `ADMIN_USERNAME` | 관리자 로그인 아이디. 직접 정합니다. |
+| `ADMIN_PASSWORD_HASH` | `npm run admin:hash` 로 생성합니다. 비밀번호 원문은 저장하지 않습니다. |
+
+환경변수는 배포 시점에 주입됩니다. **값을 추가하거나 바꾼 뒤에는 반드시 재배포해야 반영됩니다.**
+
 - `CRON_SECRET`: `/api/cron` 호출용 비밀값. 설정하지 않으면 관리자 세션으로만 호출할 수 있습니다.
 
 호출 예시:
