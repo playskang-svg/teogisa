@@ -567,6 +567,8 @@ test("keeps the organization automation scheduler running without an external cr
 
   // cron 트리거가 없거나 주기가 제한돼도 일반 요청이 밀린 작업을 따라잡습니다.
   assert.match(worker, /wakeAutomation/);
+  // 비밀값이 없어 건너뛸 때 조용히 넘어가면 멈춘 이유를 찾을 수 없습니다.
+  assert.match(worker, /automation_wake_skipped/);
   assert.match(worker, /event\.waitUntil\(/);
   assert.match(worker, /\/api\/cron/);
   // cron 엔드포인트를 다시 깨우면 무한 루프가 됩니다.
@@ -648,4 +650,22 @@ test("computes Korean object particles from the syllable's final consonant", asy
   assert.equal(withObjectParticle("체크리스트"), "체크리스트를");
   assert.equal(withObjectParticle("나누는 법"), "나누는 법을");
   assert.equal(withObjectParticle("workbook"), "workbook");
+});
+
+test("runs the automation catch-up in the node runtime, without depending on a secret", async () => {
+  const [layout, proxy] = await Promise.all([
+    readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../proxy.ts", import.meta.url), "utf8"),
+  ]);
+
+  // 기본 따라잡기는 레이아웃의 after() 입니다. Edge 런타임이 CRON_SECRET 을 읽을 수
+  // 있는지에 자동화 주기가 걸리면 안 됩니다. 실제로 그 경로가 조용히 죽은 적이 있습니다.
+  assert.match(layout, /import \{ after \} from "next\/server"/);
+  assert.match(layout, /after\(async \(\) => \{/);
+  assert.match(layout, /runAutomationTickIfDue\("request"\)/);
+  // 실패해도 페이지 렌더링을 깨뜨리면 안 됩니다.
+  assert.match(layout, /automation_tick_failed/);
+
+  // 프록시 경로는 보조입니다.
+  assert.match(proxy, /보조 경로/);
 });

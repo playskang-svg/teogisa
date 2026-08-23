@@ -20,6 +20,7 @@ const NAVER_SITE_VERIFICATION_CONTENT = "naver-site-verification: naverafe0ef742
 const WAKE_SAMPLE_RATE = 0.2;
 
 /**
+ * 보조 경로입니다. 기본 따라잡기는 app/layout.tsx 의 after() 가 담당합니다.
  * cron 트리거만 믿으면 자동화가 멈출 수 있습니다(트리거 미등록, 요금제별 주기 제한).
  * 실제 실행 여부는 /api/cron 이 데이터베이스 실행권으로 판단하므로 최소 간격 안에서는
  * 한 번만 실행됩니다. 미들웨어는 Edge 런타임이라 DB 드라이버를 직접 쓸 수 없어,
@@ -27,7 +28,12 @@ const WAKE_SAMPLE_RATE = 0.2;
  */
 function wakeAutomation(request: NextRequest, event: NextFetchEvent) {
   const secret = process.env.CRON_SECRET;
-  if (!secret) return;
+  if (!secret) {
+    // 조용히 건너뛰면 자동화가 멈춘 이유를 찾을 수 없습니다.
+    // 기본 경로는 app/layout.tsx 의 after() 이므로 이 경로가 없어도 자동화는 돕니다.
+    console.warn(JSON.stringify({ event: "automation_wake_skipped", reason: "CRON_SECRET unavailable in edge runtime" }));
+    return;
+  }
   if (request.nextUrl.pathname.startsWith("/api/cron")) return;
   if (Math.random() > WAKE_SAMPLE_RATE) return;
   event.waitUntil(

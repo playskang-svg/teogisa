@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
+import { after } from "next/server";
 import "./globals.css";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "../lib/site";
+import { runAutomationTickIfDue } from "../lib/repository";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -33,5 +35,19 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  // 자동화 따라잡기의 기본 경로입니다. 응답을 보낸 뒤 Node 런타임에서 실행되므로
+  // 페이지 속도에 영향이 없고, 비밀값이나 HTTP 왕복 없이 데이터베이스에 직접 붙습니다.
+  // 실제 실행 여부는 실행권이 판단하므로 최소 간격 안에서는 한 번만 돕니다.
+  after(async () => {
+    try {
+      await runAutomationTickIfDue("request");
+    } catch (error) {
+      console.error(JSON.stringify({
+        event: "automation_tick_failed",
+        message: error instanceof Error ? error.message : String(error),
+      }));
+    }
+  });
+
   return <html lang="ko"><head><meta name="google-adsense-account" content="ca-pub-4030620718116834"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&family=Noto+Serif+KR:wght@400;600;700&display=swap"/></head><body>{children}</body></html>;
 }
