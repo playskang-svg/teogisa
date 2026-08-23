@@ -6,14 +6,14 @@
 2. `PROJECT_HISTORY.md`
 3. `README.md`
 4. `package.json`
-5. `.openai/hosting.json`
+5. `vercel.json`
 6. `db/schema.ts`
 7. `lib/repository.ts`
 8. `app/admin/AdminClient.tsx`
 
 ## 이어서 작업할 때 지켜야 할 원칙
 
-- 기존 React/vinext/Cloudflare Worker 구조를 유지합니다.
+- Next.js 16 App Router 와 Supabase(PostgreSQL) 구조를 유지합니다.
 - 글 데이터 접근은 `lib/repository.ts` 경계를 통합니다.
 - 자동 포스팅은 완전자동 공개가 아니라 초안 → 검토 → 예약발행 순서를 유지합니다.
 - 조직 자동화는 cron·요청 따라잡기·`/api/cron` 세 경로가 같은 진입점을 공유합니다. 자세한 내용은 `AUTOMATION_RUNBOOK.md`를 봅니다.

@@ -8,9 +8,32 @@
 
 type Params = readonly unknown[];
 
-export type PostgresRunner = {
-  unsafe(query: string, params: unknown[]): Promise<unknown>;
-  begin<T>(fn: (tx: PostgresRunner) => Promise<T>): Promise<T>;
+/**
+ * 저장소 계층이 기대하는 최소 인터페이스. D1 의 부분집합이라 D1 과 이 어댑터 모두
+ * 같은 타입으로 다룰 수 있습니다.
+ */
+export type SqlStatement = {
+  bind(...values: unknown[]): SqlStatement;
+  run(): Promise<{ meta: { changes: number } }>;
+  first<T = Record<string, unknown>>(): Promise<T | null>;
+  all<T = Record<string, unknown>>(): Promise<{ results: T[] }>;
+};
+
+export type SqlDatabase = {
+  prepare(sql: string): SqlStatement;
+  batch(statements: SqlStatement[]): Promise<unknown>;
+};
+
+/**
+ * postgres 드라이버에서 이 어댑터가 실제로 쓰는 부분만 추립니다.
+ * 트랜잭션 핸들은 중첩 begin 을 제공하지 않으므로 실행기와 최상위 커넥션을 구분합니다.
+ */
+export type PostgresExecutor = {
+  unsafe(query: string, params: never[]): Promise<unknown>;
+};
+
+export type PostgresRunner = PostgresExecutor & {
+  begin<T>(fn: (tx: PostgresExecutor) => Promise<T>): Promise<T>;
 };
 
 /** SQLite의 CURRENT_TIMESTAMP 는 'YYYY-MM-DD HH:MM:SS' 문자열입니다. 컬럼도 text 이므로 형식을 맞춥니다. */
@@ -87,18 +110,18 @@ export function toPostgresQuery(sql: string) {
 
 type QueryResult = unknown[] & { count?: number };
 
-async function execute(runner: PostgresRunner, text: string, params: Params) {
+async function execute(runner: PostgresExecutor, text: string, params: Params) {
   // postgres 드라이버는 undefined 를 거부합니다. D1 은 null 과 같게 다뤘으므로 맞춰 줍니다.
-  const safe = params.map((value) => (value === undefined ? null : value));
+  const safe = params.map((value) => (value === undefined ? null : value)) as never[];
   return (await runner.unsafe(text, safe)) as QueryResult;
 }
 
 class PostgresStatement {
-  private readonly runner: PostgresRunner;
+  private readonly runner: PostgresExecutor;
   readonly text: string;
   readonly params: Params;
 
-  constructor(runner: PostgresRunner, text: string, params: Params = []) {
+  constructor(runner: PostgresExecutor, text: string, params: Params = []) {
     this.runner = runner;
     this.text = text;
     this.params = params;
@@ -108,7 +131,7 @@ class PostgresStatement {
     return new PostgresStatement(this.runner, this.text, values);
   }
 
-  withRunner(runner: PostgresRunner) {
+  withRunner(runner: PostgresExecutor) {
     return new PostgresStatement(runner, this.text, this.params);
   }
 
@@ -140,10 +163,11 @@ export class PostgresD1Adapter {
   }
 
   /** D1 의 batch 는 원자적으로 실행됩니다. 트랜잭션으로 같은 보장을 제공합니다. */
-  async batch(statements: PostgresStatement[]) {
+  async batch(statements: SqlStatement[]) {
+    const prepared = statements as PostgresStatement[];
     return this.runner.begin(async (tx) => {
       const results = [];
-      for (const statement of statements) results.push(await statement.withRunner(tx).run());
+      for (const statement of prepared) results.push(await statement.withRunner(tx).run());
       return results;
     });
   }

@@ -10,6 +10,10 @@ import { addGlossaryLinksToHtml, addOfficialOrganizationLinksToHtml, refreshOffi
 import { getEditorialAuthor } from "../../../lib/editorial-team";
 import ArticleReaderTools from "./ArticleReaderTools";
 
+// 자동화가 발행한 글이 재배포 없이 반영되어야 합니다.
+// 기존 Cloudflare 엣지 캐시(s-maxage=300)와 같은 주기로 재생성합니다.
+export const revalidate = 300;
+
 export async function generateMetadata({params}:{params:Promise<{slug:string}>}):Promise<Metadata>{const {slug}=await params;const post=await getPost(slug);if(!post)return{};const image=getThumbnailSeo(post);const author=getEditorialAuthor(post.authorName);return{title:post.title,description:post.excerpt,keywords:post.tags,authors:[{name:`${author.name} · ${author.role}`,url:"/author"}],alternates:{canonical:`/posts/${post.slug}`},openGraph:{type:"article",title:post.title,description:post.excerpt,url:`/posts/${post.slug}`,publishedTime:post.publishedAt,authors:[`${author.name} · ${author.role}`],section:post.category,tags:post.tags,images:[{url:image.src,width:image.width,height:image.height,alt:image.alt}]},twitter:{card:"summary_large_image",title:post.title,description:post.excerpt,images:[image.src]}};}
 
 type GlossaryLink = { term: string; url: string };

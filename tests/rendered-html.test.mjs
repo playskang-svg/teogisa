@@ -171,20 +171,24 @@ test("renders the finished Korean content site", async () => {
 });
 
 test("redirects www to the canonical apex domain", async () => {
-  const worker = await readFile(new URL("../worker/index.ts", import.meta.url), "utf8");
-  assert.match(worker, /url\.hostname === "www\.adbles\.com"/);
-  assert.match(worker, /url\.hostname = "adbles\.com"/);
-  assert.match(worker, /Response\.redirect\(url\.toString\(\), 301\)/);
+  const proxy = await readFile(new URL("../proxy.ts", import.meta.url), "utf8");
+  // 프록시 뒤에서는 request.url 이 내부 주소라 Host 헤더를 봐야 합니다.
+  assert.match(proxy, /request\.headers\.get\("host"\)/);
+  assert.match(proxy, /host === "www\.adbles\.com"/);
+  assert.match(proxy, /url\.hostname = "adbles\.com"/);
+  assert.match(proxy, /NextResponse\.redirect\(url\.toString\(\), 301\)/);
 });
 
 test("serves the Naver verification file at its exact public path", async () => {
   const [worker, verification] = await Promise.all([
-    readFile(new URL("../worker/index.ts", import.meta.url), "utf8"),
+    readFile(new URL("../proxy.ts", import.meta.url), "utf8"),
     readFile(new URL("../public/naverafe0ef74210245a649d66c3a595329e9.html", import.meta.url), "utf8"),
   ]);
   assert.match(worker, /NAVER_SITE_VERIFICATION_PATH/);
   assert.match(worker, /NAVER_SITE_VERIFICATION_CONTENT/);
-  assert.match(worker, /return new Response\(NAVER_SITE_VERIFICATION_CONTENT/);
+  assert.match(worker, /return new NextResponse\(NAVER_SITE_VERIFICATION_CONTENT/);
+  // cleanUrls 가 .html 을 확장자 없는 주소로 돌리므로 라우팅에 맡기면 안 됩니다.
+  assert.match(worker, /"content-type": "text\/plain; charset=utf-8"/);
   assert.equal(verification.trim(), "naver-site-verification: naverafe0ef74210245a649d66c3a595329e9.html");
 });
 
@@ -495,28 +499,19 @@ test("ships mobile-first SEO, GEO, trust and original-value pages", async () => 
 });
 
 test("keeps public reads fast while automation runs in the background", async () => {
-  const [worker, repository, releasePolicy] = await Promise.all([
-    readFile(new URL("../worker/index.ts", import.meta.url), "utf8"),
+  const [home, article, repository, releasePolicy] = await Promise.all([
+    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/posts/[slug]/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../lib/repository.ts", import.meta.url), "utf8"),
     readFile(new URL("../lib/release-policy.ts", import.meta.url), "utf8"),
   ]);
-  assert.match(worker, /PUBLIC_CACHE_CONTROL/);
-  assert.match(worker, /stale-while-revalidate=86400/);
-  assert.match(worker, /edgeCache\.match/);
-  assert.match(worker, /edgeCache\.put/);
-  assert.match(worker, /caches\?\.default/);
-  assert.match(worker, /if\(key&&edgeCache\)/);
-  assert.match(worker, /scheduled_organization_activity_failed/);
-  assert.match(worker, /runScheduledOrganizationActivities/);
+  // 자동화가 발행한 글이 재배포 없이 반영되어야 합니다. 정적 생성으로 굳으면 안 됩니다.
+  assert.match(home, /export const revalidate = 300;/);
+  assert.match(article, /export const revalidate = 300;/);
+  // 공개 읽기는 스키마 점검과 시드 쓰기를 기다리지 않습니다.
   assert.match(repository, /db\(\{initialize:false\}\)/);
   assert.match(repository, /persistedSlugs/);
   assert.match(repository, /persistedTitles/);
-  assert.match(repository, /!persistedSlugs\.has\(post\.slug\)&&!persistedTitles\.has\(post\.title\.trim\(\)\)/);
-  assert.match(repository, /decodeURIComponent\(slug\)\.normalize\(\"NFC\"\)/);
-  assert.match(repository, /bind\(normalizedSlug\)/);
-  assert.match(repository, /legacyPostSlugAliases\[slug\]/);
-  assert.match(repository, /runDueSiteManagementAudit/);
-  assert.match(repository, /await publishDuePosts\(\)/);
   assert.match(releasePolicy, /availability:/);
 });
 
@@ -548,7 +543,7 @@ test("schedules every member with auditable hourly or daily work", async () => {
 test("keeps the organization automation scheduler running without an external cron", async () => {
   const [repository, worker, cronRoute, automationRoute, admin, css, vercel, runbook] = await Promise.all([
     readFile(new URL("../lib/repository.ts", import.meta.url), "utf8"),
-    readFile(new URL("../worker/index.ts", import.meta.url), "utf8"),
+    readFile(new URL("../proxy.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/api/cron/route.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/api/automation/route.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/admin/AdminClient.tsx", import.meta.url), "utf8"),
@@ -570,10 +565,14 @@ test("keeps the organization automation scheduler running without an external cr
   assert.match(repository, /getAutomationSchedulerStatus/);
   assert.match(repository, /AUTOMATION_TICK_INTERVAL_MINUTES=15/);
 
-  // cron 트리거가 없는 환경에서도 일반 요청이 밀린 작업을 따라잡습니다.
-  assert.match(worker, /shouldCatchUpAutomation/);
-  assert.match(worker, /ctx\.waitUntil\(runAutomationTickIfDue\("request"\)/);
-  assert.match(worker, /runScheduledOrganizationActivities\("cron"\)/);
+  // cron 트리거가 없거나 주기가 제한돼도 일반 요청이 밀린 작업을 따라잡습니다.
+  assert.match(worker, /wakeAutomation/);
+  assert.match(worker, /event\.waitUntil\(/);
+  assert.match(worker, /\/api\/cron/);
+  // cron 엔드포인트를 다시 깨우면 무한 루프가 됩니다.
+  assert.match(worker, /pathname\.startsWith\("\/api\/cron"\)/);
+  // 매 요청마다 깨우면 실행권 검사만 하는 호출이 트래픽만큼 쌓입니다.
+  assert.match(worker, /WAKE_SAMPLE_RATE/);
 
   // 외부 스케줄러 입구는 비밀값이나 관리자 세션이 있어야 합니다.
   assert.match(cronRoute, /CRON_SECRET/);

@@ -1,5 +1,5 @@
 import postgres from "postgres";
-import { env } from "cloudflare:workers";
+import { PostgresD1Adapter, type SqlDatabase } from "./postgres-adapter";
 import { seedPosts, type Post } from "./content";
 import { contentAgentProfiles, type ContentAgentProfile } from "./content-agents";
 import { getArticlePlaybook, withObjectParticle } from "./agent-article-playbook";
@@ -21,11 +21,22 @@ export function getPgClient() {
   const url = process.env.DATABASE_URL;
   if (url) {
     if (!pgSql) {
-      pgSql = postgres(url, { idle_timeout: 20, max: 10 });
+      // 서버리스에서는 인스턴스마다 커넥션을 잡으므로 넉넉히 두면 DB 쪽이 먼저 고갈됩니다.
+      pgSql = postgres(url, { idle_timeout: 20, max: 4, prepare: false });
     }
     return pgSql;
   }
   return null;
+}
+
+let pgAdapter: SqlDatabase | null = null;
+function sqlDatabase(): SqlDatabase {
+  const client = getPgClient();
+  if (!client) {
+    throw new Error("DATABASE_URL 이 설정되지 않았습니다. Supabase 연결 문자열을 환경변수로 등록하세요.");
+  }
+  if (!pgAdapter) pgAdapter = new PostgresD1Adapter(client);
+  return pgAdapter;
 }
 
 
@@ -54,8 +65,7 @@ let initialized = false;
 const CONTENT_QUALITY_REVISION="2026-08-14-adsense-readiness-v2-deposit-protection-v1-official-source-refresh-v1";
 
 async function db(options:{initialize?:boolean}={}) {
-  const d1 = (env as unknown as { DB?: D1Database }).DB;
-  if (!d1) throw new Error("DB binding unavailable");
+  const d1 = sqlDatabase();
 
   // Public page reads must never wait for schema checks or seed writes.
   if (options.initialize === false) return d1;
@@ -576,7 +586,7 @@ export async function runOrganizationAudit(){
     const settingsMap=new Map(settings.results.map(row=>[String(row.key),String(row.value_json)]));
     const policyProblems=posts.results.reduce((sum,row)=>sum+inspectPublicationPolicy(mapPost(row as Record<string,unknown>)).length,0);
     const originalityCounts=new Map(originality.results.map(row=>[String(row.status),Number(row.count)]));
-    const security=env as unknown as {ADMIN_USERNAME?:string;ADMIN_PASSWORD_HASH?:string;ADMIN_SESSION_SECRET?:string};
+    const security=process.env as {ADMIN_USERNAME?:string;ADMIN_PASSWORD_HASH?:string;ADMIN_SESSION_SECRET?:string};
     const checks:AuditCheck[]=[
       {domain:"governance",severity:settingsMap.get("company_rules_version")===JSON.stringify(COMPANY_RULES_VERSION)&&companyRules.strategicObjectives.every(item=>item.owner&&item.kpis.length)?"info":"major",title:"사규·경영목표 책임체계",details:`사규 ${COMPANY_RULES_VERSION}, 경영목표 ${companyRules.strategicObjectives.length}개와 담당자를 대조했습니다.`,actionOwner:"강한결"},
       {domain:"people",severity:organizationPolicyCoverage.applied===organizationPolicyCoverage.total?"info":"major",title:"전 직원 사규 적용",details:`전사 적용 ${organizationPolicyCoverage.applied}/${organizationPolicyCoverage.total}명, ${organizationPolicyCoverage.departments.length}개 팀을 확인했습니다.`,actionOwner:"강한결"},
@@ -606,7 +616,7 @@ export async function resolveAuditFinding(id:number,resolution:string){assertTea
 function mapMemberActivityPlan(row:Record<string,unknown>):MemberActivityPlanState{return{id:String(row.id),memberId:String(row.member_id),memberName:String(row.member_name),teamId:String(row.team_id),teamName:String(row.team_name),role:String(row.role),frequency:row.frequency==="hourly"?"hourly":"daily",intervalHours:row.interval_hours==null?null:Number(row.interval_hours),dailyHourKst:row.daily_hour_kst==null?null:Number(row.daily_hour_kst),minuteOffset:Number(row.minute_offset??0),action:row.action as ActivityAction,taskTitle:String(row.task_title),instruction:String(row.instruction),safeOutput:String(row.safe_output),requiresApproval:Number(row.requires_approval)===1,status:row.status==="paused"?"paused":"active",nextRunAt:row.next_run_at?String(row.next_run_at):null,lastRunAt:row.last_run_at?String(row.last_run_at):null};}
 function mapMemberActivityRun(row:Record<string,unknown>):MemberActivityRun{return{id:Number(row.id),planId:String(row.plan_id),memberName:String(row.member_name),teamName:String(row.team_name),action:row.action as ActivityAction,status:row.status==="failed"?"failed":row.status==="noop"?"noop":row.status==="review"?"review":"completed",summary:String(row.summary),startedAt:String(row.started_at),completedAt:row.completed_at?String(row.completed_at):null};}
 
-async function activitySnapshot(d1:D1Database,action:ActivityAction){
+async function activitySnapshot(d1:SqlDatabase,action:ActivityAction){
   if(action==="management-monitor"){const run=await runDueSiteManagementAudit();return run?{status:"completed" as const,summary:`사이트 운영 ${run.checkedCount}건을 점검하고 문제 ${run.issueCount}건, 즉시조치 ${run.actionCount}건을 기록했습니다.`}:{status:"noop" as const,summary:"최근 6시간 내 사이트 점검이 완료되어 중복 감사를 생략했습니다."};}
   if(action==="management-audit"){const run=await runDueOrganizationAudit();return run?{status:"completed" as const,summary:`전 프로젝트 감사 ${run.totalItems}개 항목을 수행하고 지적 ${run.findingCount}건을 문서화했습니다.`}:{status:"noop" as const,summary:"최근 30일 내 전사 감사가 완료되어 중복 감사를 생략했습니다."};}
   const [posts,queue,issues,promotions]=await Promise.all([
@@ -646,8 +656,8 @@ export type AutomationTick={source:string;startedAt:string;finishedAt:string;rev
 export type AutomationTargetStatus={active:number;paused:number;due:number;stalled:number};
 export type AutomationSchedulerStatus={intervalMinutes:number;stallMinutes:number;running:boolean;lastTick:AutomationTick|null;lastTickAt:string|null;minutesSinceLastTick:number|null;agents:AutomationTargetStatus;plans:AutomationTargetStatus;lastAgentRunAt:string|null;lastMemberRunAt:string|null};
 
-async function readSetting<T>(d1:D1Database,key:string){const row=await d1.prepare("SELECT value_json FROM site_settings WHERE key=?").bind(key).first<{value_json:string}>();if(!row)return null;try{return JSON.parse(String(row.value_json)) as T;}catch{return null;}}
-async function writeSetting(d1:D1Database,key:string,value:unknown){await d1.prepare("INSERT INTO site_settings (key,value_json,updated_at) VALUES (?,?,CURRENT_TIMESTAMP) ON CONFLICT(key) DO UPDATE SET value_json=excluded.value_json,updated_at=CURRENT_TIMESTAMP").bind(key,JSON.stringify(value)).run();}
+async function readSetting<T>(d1:SqlDatabase,key:string){const row=await d1.prepare("SELECT value_json FROM site_settings WHERE key=?").bind(key).first<{value_json:string}>();if(!row)return null;try{return JSON.parse(String(row.value_json)) as T;}catch{return null;}}
+async function writeSetting(d1:SqlDatabase,key:string,value:unknown){await d1.prepare("INSERT INTO site_settings (key,value_json,updated_at) VALUES (?,?,CURRENT_TIMESTAMP) ON CONFLICT(key) DO UPDATE SET value_json=excluded.value_json,updated_at=CURRENT_TIMESTAMP").bind(key,JSON.stringify(value)).run();}
 function errorMessage(error:unknown){return error instanceof Error?error.message:"알 수 없는 오류";}
 
 /**
@@ -695,7 +705,7 @@ export async function runAutomationTickIfDue(source:string="request",minInterval
   return runScheduledOrganizationActivities(source);
 }
 
-async function automationTargetStatus(d1:D1Database,table:"content_agents"|"member_activity_plans",now:string){
+async function automationTargetStatus(d1:SqlDatabase,table:"content_agents"|"member_activity_plans",now:string){
   const row=await d1.prepare(`SELECT
     SUM(CASE WHEN status='active' THEN 1 ELSE 0 END) AS active,
     SUM(CASE WHEN status<>'active' THEN 1 ELSE 0 END) AS paused,

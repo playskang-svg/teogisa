@@ -1,6 +1,10 @@
 import { getPublishedPosts } from "../../lib/repository";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "../../lib/site";
 
+// 자동화가 발행한 글이 재배포 없이 반영되어야 합니다.
+// 기존 Cloudflare 엣지 캐시(s-maxage=300)와 같은 주기로 재생성합니다.
+export const revalidate = 300;
+
 export const dynamic = "force-dynamic";
 
 function escapeXml(value: string) {

@@ -6,18 +6,17 @@
 
 ## 1. 기술 구성
 
-- 화면: React 19, Next.js 호환 App Router, vinext
-- 실행 환경: Cloudflare Worker 호환 ESM
-- 데이터베이스: Cloudflare D1(SQLite)
-- 데이터 접근: Drizzle ORM과 독립 저장소 계층
-- 배포: ChatGPT Sites
+- 화면: React 19, Next.js 16 App Router
+- 실행 환경: Vercel(Node 런타임) · 요청 전처리는 `proxy.ts`
+- 데이터베이스: Supabase(PostgreSQL)
+- 데이터 접근: 독립 저장소 계층. `lib/postgres-adapter.ts` 가 D1 형태의 호출을 Postgres 로 옮깁니다.
+- 배포: Vercel(GitHub 연동)
 - 관리자 인증: 사이트 자체 아이디·비밀번호, 서명된 보안 쿠키
 
 ## 2. 핵심 디렉터리
 
 ```text
 .
-├── .openai/hosting.json        # Sites 프로젝트와 D1 논리 바인딩
 ├── app/                        # 화면과 서버 API
 │   ├── admin/                  # 관리자 로그인·글 목록·편집기
 │   ├── api/                    # 글, 자동발행, 백업, 세션 API
@@ -31,8 +30,8 @@
 ├── lib/                        # 콘텐츠, 저장소, 인증, SEO 보강
 ├── public/                     # 썸네일, OG 이미지, llms.txt
 ├── tests/                      # 렌더링·보안·SEO 회귀 테스트
-├── worker/                     # Cloudflare Worker 진입점
-└── build/                      # Sites용 빌드 연결부
+├── proxy.ts                    # 도메인 정규화, 소유확인 파일, 자동화 따라잡기
+└── vercel.json                 # 배포 설정과 cron
 ```
 
 ## 3. 주요 화면
@@ -95,4 +94,10 @@ npm run dev
 npm test
 ```
 
-운영 비밀값과 D1 연결은 새로운 호스팅 환경에서 별도로 설정해야 합니다.
+운영에는 다음 환경변수가 필요합니다.
+
+- `DATABASE_URL`: Supabase 연결 문자열(서버리스에서는 pooler 주소를 씁니다)
+- `CRON_SECRET`: `/api/cron` 호출용 비밀값
+- `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, `ADMIN_SESSION_SECRET`
+
+첫 요청에서 저장소 계층이 스키마를 만들고 기본 콘텐츠를 시드합니다.

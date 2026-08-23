@@ -6,9 +6,9 @@
 
 | 경로 | 실행 주체 | 주기 | 비고 |
 | --- | --- | --- | --- |
-| Cloudflare cron 트리거 | `worker/index.ts`의 `scheduled()` | 30분 | 배포 환경에 cron 트리거가 등록된 경우에만 동작합니다. |
-| 사이트 요청 따라잡기 | `worker/index.ts`의 `fetch()` | 최소 15분 간격 | cron이 없어도 방문·크롤러 요청이 밀린 작업을 처리합니다. |
-| 외부 스케줄러 호출 | `GET/POST /api/cron` | 호출한 주기 | Vercel Cron, 업타임 모니터, 사내 배치에서 호출합니다. |
+| Vercel Cron | `vercel.json` 의 `crons` → `/api/cron` | 30분 | 요금제에 따라 최소 주기가 제한될 수 있습니다. |
+| 요청 따라잡기 | `proxy.ts` → `/api/cron` | 최소 15분 간격 | cron 이 없거나 주기가 길어도 트래픽이 밀린 작업을 처리합니다. |
+| 수동 실행 | 관리자 화면 · `POST /api/cron` | 즉시 | 점검과 복구용입니다. |
 
 세 경로 모두 같은 진입점(`runScheduledOrganizationActivities`)을 사용합니다. 실행권은 D1의 조건부 갱신으로 한 번에 하나만 잡히므로 경로가 겹쳐도 중복 실행되지 않습니다.
 
