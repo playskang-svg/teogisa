@@ -48,9 +48,12 @@
 
 - `GET/POST /api/posts`: 관리자용 전체 글 조회와 새 글 저장
 - `PATCH /api/posts/[id]`: 기존 글 수정
-- `GET/POST /api/automation`: 검토 대기열 조회와 초안 생성
+- `GET/POST /api/automation`: 검토 대기열·스케줄러 상태 조회와 초안 생성, 자동화 즉시 실행(`action:"run-scheduler"`)
+- `GET/POST /api/cron`: 외부 스케줄러용 자동화 실행 입구(`CRON_SECRET` 또는 관리자 세션 필요, `?status=1`은 상태만 조회)
 - `GET /api/export`: 전체 데이터 JSON 백업
 - `POST/DELETE /api/admin/session`: 로그인과 로그아웃
+
+자동화 실행 경로와 점검 순서는 `AUTOMATION_RUNBOOK.md`에 정리했습니다.
 
 쓰기 API는 관리자 세션을 확인합니다. 공개 글 조회는 저장소 계층에서 `published` 상태만 노출합니다.
 

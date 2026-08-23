@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import type { Post } from "../../lib/content";
-import type { AgentRun, AuditFinding, AuditRun, ContentAgentState, ManagementIssue, ManagementRun, MemberActivityPlanState, MemberActivityRun, OriginalityCheck, PromotionCampaign, QueueItem } from "../../lib/repository";
+import type { AgentRun, AuditFinding, AuditRun, AutomationSchedulerStatus, ContentAgentState, ManagementIssue, ManagementRun, MemberActivityPlanState, MemberActivityRun, OriginalityCheck, PromotionCampaign, QueueItem } from "../../lib/repository";
 import type { AuditDomain, AuditOfficer } from "../../lib/internal-audit";
 import type { ManagementMember } from "../../lib/management-department";
 import type { OrganizationPolicyRecipient } from "../../lib/organization-policy";
@@ -29,6 +29,7 @@ function datetimeLocal(value: string | null) {
 export default function AdminClient({ username }: { username: string }) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [queue, setQueue] = useState<QueueItem[]>([]);
+  const [scheduler,setScheduler]=useState<AutomationSchedulerStatus|null>(null);
   const [agents,setAgents]=useState<ContentAgentState[]>([]);
   const [agentRuns,setAgentRuns]=useState<AgentRun[]>([]);
   const [promotions,setPromotions]=useState<PromotionCampaign[]>([]);
@@ -65,6 +66,7 @@ export default function AdminClient({ username }: { username: string }) {
     if (postsResponse.ok && queueResponse.ok && agentsResponse.ok && promotionsResponse.ok && managementResponse.ok&&auditResponse.ok&&activityResponse.ok) {
       setPosts(postsData.posts);
       setQueue(queueData.queue);
+      setScheduler(queueData.scheduler??null);
       setAgents(agentsData.agents);
       setAgentRuns(agentsData.runs);
       setPromotions(promotionsData.campaigns);
@@ -148,6 +150,19 @@ export default function AdminClient({ username }: { username: string }) {
     } else setMessage(data.error);
   }
 
+  async function runScheduler(){
+    setSaving(true);
+    const response=await fetch("/api/automation",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({action:"run-scheduler"})});
+    const data=await response.json();
+    setSaving(false);
+    if(!response.ok){setMessage(data.error||"자동화를 실행하지 못했습니다.");return;}
+    const tick=data.tick as {revived:{agents:number;plans:number};content:{checked:number;failed:number}|null;members:{checked:number;executed:number;failed:number}|null;errors:string[]};
+    setMessage(tick.errors.length>0
+      ?`자동화를 실행했지만 일부 작업이 실패했습니다: ${tick.errors.join(" / ")}`
+      :`자동화를 실행했습니다. 에이전트 ${tick.content?.checked??0}건, 구성원 실행 ${tick.members?.executed??0}건, 멈춰 있던 항목 ${tick.revived.agents+tick.revived.plans}건을 다시 가동했습니다.`);
+    await load();
+  }
+
   async function controlAgent(id:string,action:"run"|"status",status?:"active"|"paused"){
     setSaving(true);const response=await fetch("/api/agents",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({id,action,status})});const data=await response.json();setSaving(false);if(response.ok){setMessage(action==="run"?`‘${data.post.title}’ 초안을 만들고 정책 검토 대기에 등록했습니다.`:`에이전트를 ${status==="active"?"가동":"일시정지"}했습니다.`);await load();}else setMessage(data.error);
   }
@@ -209,6 +224,19 @@ export default function AdminClient({ username }: { username: string }) {
 
         <section className="panel automation-panel">
           <div className="panel-title"><div><p className="eyebrow">REVIEW QUEUE</p><h2>자동 포스팅 준비</h2></div><span className="queue-count">검토 {queue.filter((item) => item.status === "review").length}</span></div>
+          <section className={`scheduler-status ${scheduler?scheduler.running?"running":"stopped":"unknown"}`} aria-label="자동화 스케줄러 상태">
+            <header>
+              <div><span>{scheduler?scheduler.running?"자동화 가동 중":"자동화 정지 감지":"상태 확인 중"}</span><strong>{scheduler?.lastTickAt?`최근 실행 ${new Date(scheduler.lastTickAt).toLocaleString("ko-KR")}`:"아직 실행 기록이 없습니다."}</strong></div>
+              <button className="admin-button" type="button" disabled={saving} onClick={()=>void runScheduler()}>지금 자동화 실행</button>
+            </header>
+            {scheduler&&<dl>
+              <div><dt>에이전트</dt><dd>가동 {scheduler.agents.active} · 실행대기 {scheduler.agents.due}{scheduler.agents.stalled>0?` · 멈춤 ${scheduler.agents.stalled}`:""}</dd></div>
+              <div><dt>구성원 실행계획</dt><dd>가동 {scheduler.plans.active} · 실행대기 {scheduler.plans.due}{scheduler.plans.stalled>0?` · 멈춤 ${scheduler.plans.stalled}`:""}</dd></div>
+              <div><dt>점검 주기</dt><dd>{scheduler.intervalMinutes}분마다 자동 확인</dd></div>
+            </dl>}
+            {scheduler&&scheduler.lastTick&&scheduler.lastTick.errors.length>0&&<p className="scheduler-error">직전 실행 오류: {scheduler.lastTick.errors.join(" / ")}</p>}
+            {scheduler&&!scheduler.running&&<p className="scheduler-help">{scheduler.stallMinutes}분 넘게 자동 실행 기록이 없습니다. 위 버튼으로 즉시 실행하고, 외부 스케줄러가 <code>/api/cron</code>을 주기적으로 호출하는지 확인하세요.</p>}
+          </section>
           <p className="panel-help">공식 자료 주소와 주제를 넣으면 검토 체크리스트가 포함된 초안을 만듭니다. 공개 글에는 전용 썸네일, 핵심 흐름 다이어그램, 확인표, 공식자료와 위키백과 용어 링크가 자동 구성됩니다. 초안을 확인해 예약 상태로 바꾸면 지정 시각 이후 자동으로 공개됩니다.</p>
           <form className="queue-form" onSubmit={createQueueDraft}>
             <div className="field"><label htmlFor="topic">글 주제</label><input id="topic" name="topic" required placeholder="예: 2026년 실업크레딧 신청 방법" /></div>

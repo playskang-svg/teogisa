@@ -1,11 +1,14 @@
-import { createAutomationDraft, getPostingQueue } from "../../../lib/repository";
+import { createAutomationDraft, getAutomationSchedulerStatus, getPostingQueue, runScheduledOrganizationActivities } from "../../../lib/repository";
 import { requireOwnerApi } from "../../../lib/site-admin";
 import { assertTeamPermission } from "../../../lib/team-permissions";
 
 export async function GET(request:Request) {
   const auth = await requireOwnerApi(request);
   if (auth.response) return auth.response;
-  try { return Response.json({ queue: await getPostingQueue() }); }
+  try {
+    const [queue, scheduler] = await Promise.all([getPostingQueue(), getAutomationSchedulerStatus()]);
+    return Response.json({ queue, scheduler });
+  }
   catch (error) { return Response.json({ error: error instanceof Error ? error.message : "발행 대기열을 불러오지 못했습니다." }, { status: 500 }); }
 }
 
@@ -13,8 +16,13 @@ export async function POST(request: Request) {
   const auth = await requireOwnerApi(request);
   if (auth.response) return auth.response;
   try {
-    assertTeamPermission("owner","content.draft.create");
     const payload = (await request.json()) as Record<string, string>;
+    if (payload.action === "run-scheduler") {
+      assertTeamPermission("owner", "automation.run");
+      const tick = await runScheduledOrganizationActivities("admin");
+      return Response.json({ tick, scheduler: await getAutomationSchedulerStatus() });
+    }
+    assertTeamPermission("owner", "content.draft.create");
     if (!payload.topic?.trim() || !payload.sourceUrl?.trim()) {
       return Response.json({ error: "글 주제와 공식 자료 주소를 입력하세요." }, { status: 400 });
     }
