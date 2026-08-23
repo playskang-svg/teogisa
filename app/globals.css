@@ -433,6 +433,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   .search-programs header small{max-width:none;text-align:left}
 }
 
+.article-desk-note{margin:-6px 0 26px;padding:10px 14px;border-left:3px solid var(--teal);background:var(--mist);color:var(--muted-ink);font-size:13px;line-height:1.6}
 .article-video-feature{margin:42px 0 28px;padding:28px;display:grid;grid-template-columns:minmax(0,.8fr) minmax(320px,1.2fr);gap:28px;align-items:center;color:#fff;background:var(--navy)}
 .article-video-feature .eyebrow{margin-bottom:12px;color:#9fcfc4}
 .article-video-feature h3{margin:0;color:#fff;font:700 23px/1.45 "Noto Serif KR",serif}

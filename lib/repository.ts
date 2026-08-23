@@ -2,6 +2,7 @@ import postgres from "postgres";
 import { env } from "cloudflare:workers";
 import { seedPosts, type Post } from "./content";
 import { contentAgentProfiles, type ContentAgentProfile } from "./content-agents";
+import { getArticlePlaybook, withObjectParticle } from "./agent-article-playbook";
 import { EDITOR_IN_CHIEF } from "./editorial-team";
 import { SITE_NAME } from "./site";
 import { assertPublicationReady, inspectPublicationPolicy, managementDepartment } from "./management-department";
@@ -429,25 +430,43 @@ export async function preparePromotionCampaign(postId?:number){
 
 export async function executePromotionCampaign(id:number){assertTeamPermission("promotion","promotion.execute.record");const d1=await db();const row=await d1.prepare("UPDATE promotion_campaigns SET status='executed',executed_at=CURRENT_TIMESTAMP WHERE id=? RETURNING *").bind(id).first();if(!row)throw new Error("홍보 작업을 찾지 못했습니다.");const post=await d1.prepare("SELECT title,slug,excerpt,category FROM posts WHERE id=?").bind(Number(row.post_id)).first();return mapPromotion({...row,...post} as Record<string,unknown>);}
 
-const agentScenarios:Record<string,string>={
-  "실제 수익실험":"예를 들어 첫 달 목표를 매출이 아니라 유료 문의 1건으로 정하고, 준비시간과 실제 작업시간을 나눠 기록합니다.",
-  "정부지원·세무":"예를 들어 대상 여부, 신청기한, 제출서류와 담당기관 답변을 한 장에 적어 경험담과 공식 기준을 섞지 않습니다.",
-  "유용한 도구":"예를 들어 계산 결과만 보여주지 않고 입력값의 뜻, 계산식, 결과가 달라지는 조건과 공식 확인처를 함께 제공합니다.",
-  "지역 생활정보":"예를 들어 지역명만 바꾸지 않고 실제 담당기관, 신청 창구, 운영기간과 문의 전 준비할 질문을 확인합니다.",
-  "건강·예방":"예를 들어 증상만 나열하지 않고 응급 신호, 예방 행동, 진료가 필요한 시점과 공공기관 안내를 구분합니다.",
-  "영상 큐레이션":"예를 들어 조회수만 보지 않고 공식 채널 여부, 설명의 최신성, 본문과의 관련성, 과장 표현 여부를 함께 확인합니다.",
-};
+
+/** 자동 생성 본문의 최소 품질 기준. 이 아래로는 검토 대기열에 올리지 않습니다. */
+export const ARTICLE_MIN_PLAIN_LENGTH=1500;
+export const ARTICLE_MIN_HEADINGS=5;
 
 function buildAgentArticleBody(agent:ContentAgentState,topic:string){
+  const playbook=getArticlePlaybook(agent.category);
+  const list=(items:readonly string[])=>items.map(item=>`<li>${htmlEscape(item)}</li>`).join("");
   const sourceRows=agent.sources.map(source=>`<tr><td><a href="${htmlEscape(source.url)}" target="_blank" rel="noopener noreferrer">${htmlEscape(source.name)} 공식 원문</a></td><td>대상·기준일·신청 또는 실행 조건</td><td>발행 전 재확인</td></tr>`).join("");
   const sourceList=agent.sources.map(source=>`<li><a href="${htmlEscape(source.url)}" target="_blank" rel="noopener noreferrer">${htmlEscape(source.name)}에서 최신 기준 확인</a></li>`).join("");
-  const scenario=agentScenarios[agent.category]??"예를 들어 실제 조건과 숫자를 넣은 작은 사례를 만들고, 독자가 자기 상황에 적용할 때 바꿔야 할 항목을 따로 표시합니다.";
+  const termRows=playbook.terms.map(item=>`<tr><td>${htmlEscape(item.term)}</td><td>${htmlEscape(item.meaning)}</td></tr>`).join("");
+  const faqBlocks=playbook.faq.map(item=>`<h3>${htmlEscape(item.question)}</h3><p>${htmlEscape(item.answer)}</p>`).join("");
+  // 같은 에이전트가 다루는 다른 주제를 연결해 독자가 다음에 확인할 질문을 이어가게 합니다.
+  const related=agent.topics.filter(item=>item!==topic).slice(0,4);
+  const relatedBlock=related.length>0?`<h2>함께 확인하면 좋은 질문</h2><p>${htmlEscape(agent.category)} 분야에서 같은 기준으로 정리하고 있는 인접 주제입니다. 지금 상황과 가까운 항목부터 확인하세요.</p><ul>${list(related)}</ul>`:"";
   const video=agent.video?`<h2>글과 함께 확인할 공식 영상</h2><p>아래 영상은 글의 핵심 개념을 다른 방식으로 이해하는 보조자료입니다. 영상의 게시일과 설명란도 함께 확인하세요.</p><div class="embedded-video"><iframe src="${htmlEscape(agent.video.embedUrl)}" title="${htmlEscape(agent.video.title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div><p><a href="${htmlEscape(agent.video.sourceUrl)}" target="_blank" rel="noopener noreferrer">${htmlEscape(agent.video.title)} 원본 영상과 채널 확인</a></p>`:"";
-  const body=`<p><strong>${htmlEscape(topic)}</strong>을 알아볼 때 가장 먼저 해야 할 일은 검색 결과를 많이 모으는 것이 아니라, 내 조건에 적용되는 공식 기준과 실행 순서를 분리하는 것입니다. 이 글은 ${htmlEscape(agent.mission)} 독자가 직접 확인할 수 있도록 원문 링크, 사례, 표와 체크리스트를 함께 구성했습니다.</p><h2>이 글이 답할 질문</h2><ul><li>누가 이 내용을 먼저 확인해야 하는가?</li><li>금액·기간·대상 조건 중 개인별로 달라지는 것은 무엇인가?</li><li>오늘 바로 할 수 있는 가장 작은 행동은 무엇인가?</li></ul><h2>실제 상황에 적용하는 예시</h2><p>${htmlEscape(scenario)}</p><blockquote>사례의 숫자와 조건은 설명을 위한 예시입니다. 실제 신청·신고·진료·투자 판단은 본인의 조건과 최신 원문을 기준으로 확인하세요.</blockquote><h2>원문을 대조하는 표</h2><table><thead><tr><th>확인처</th><th>확인할 내용</th><th>점검 시점</th></tr></thead><tbody>${sourceRows}</tbody></table><h2>실행 전 체크리스트</h2><ol><li>공식 페이지의 게시일과 적용기간을 확인합니다.</li><li>대상·소득·연령·지역처럼 달라지는 조건을 표시합니다.</li><li>전화나 방문 문의가 필요하면 질문을 세 문장으로 적습니다.</li><li>결과뿐 아니라 걸린 시간과 비용을 기록합니다.</li></ol><h2>공식 확인처</h2><ul>${sourceList}</ul>${video}<h2>편집실의 판단 기준</h2><p>과장된 수익 보장, 근거 없는 숫자, 출처가 불분명한 경험담은 결론의 근거로 사용하지 않습니다. 공식 기준과 실제 사례가 다르면 차이가 생긴 조건을 설명하고, 변경 가능성이 큰 정보에는 신청 또는 실행 시점의 재확인을 안내합니다.</p>`;
+
+  const body=`<p><strong>${htmlEscape(topic)}</strong>${htmlEscape(withObjectParticle(topic).slice(topic.length))} 알아볼 때 가장 먼저 해야 할 일은 검색 결과를 많이 모으는 것이 아니라, 내 조건에 적용되는 공식 기준과 실행 순서를 분리하는 것입니다. 이 글은 독자가 직접 확인할 수 있도록 원문 링크, 적용 사례, 용어 정리, 비교표와 실행 체크리스트를 함께 구성했습니다.</p><p class="article-desk-note">${htmlEscape(agent.category)} 담당 · ${htmlEscape(agent.mission)}</p>`
+    +`<h2>먼저 확인할 핵심 요약</h2><ul>${list(playbook.summary)}</ul>`
+    +`<h2>이 글이 답할 질문</h2><ul><li>누가 이 내용을 먼저 확인해야 하는가?</li><li>금액·기간·대상 조건 중 개인별로 달라지는 것은 무엇인가?</li><li>오늘 바로 할 수 있는 가장 작은 행동은 무엇인가?</li></ul>`
+    +`<h2>실제 상황에 적용하는 예시</h2><p>${htmlEscape(playbook.scenario)}</p><blockquote>사례의 숫자와 조건은 설명을 위한 예시입니다. 실제 신청·신고·진료·투자 판단은 본인의 조건과 최신 원문을 기준으로 확인하세요.</blockquote>`
+    +`<h2>순서대로 실행하기</h2><ol>${list(playbook.steps)}</ol>`
+    +`<h2>헷갈리기 쉬운 용어</h2><table><thead><tr><th>용어</th><th>뜻과 확인할 점</th></tr></thead><tbody>${termRows}</tbody></table>`
+    +`<h2>자주 하는 실수</h2><ul>${list(playbook.mistakes)}</ul>`
+    +`<h2>원문을 대조하는 표</h2><table><thead><tr><th>확인처</th><th>확인할 내용</th><th>점검 시점</th></tr></thead><tbody>${sourceRows}</tbody></table>`
+    +`<h2>실행 전 체크리스트</h2><ol><li>공식 페이지의 게시일과 적용기간을 확인합니다.</li><li>대상·소득·연령·지역처럼 달라지는 조건을 표시합니다.</li><li>전화나 방문 문의가 필요하면 질문을 세 문장으로 적습니다.</li><li>결과뿐 아니라 걸린 시간과 비용을 기록합니다.</li></ol>`
+    +`<h2>자주 묻는 질문</h2>${faqBlocks}`
+    +relatedBlock
+    +`<h2>공식 확인처</h2><ul>${sourceList}</ul>`
+    +video
+    +`<h2>이 분야에서 특히 주의할 점</h2><p>${htmlEscape(playbook.caution)}</p>`
+    +`<h2>편집실의 판단 기준</h2><p>과장된 수익 보장, 근거 없는 숫자, 출처가 불분명한 경험담은 결론의 근거로 사용하지 않습니다. 공식 기준과 실제 사례가 다르면 차이가 생긴 조건을 설명하고, 변경 가능성이 큰 정보에는 신청 또는 실행 시점의 재확인을 안내합니다.</p>`;
+
   const plain=body.replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim();
   const headings=(body.match(/<h2>/g)??[]).length;
   // 실패 사유를 수치로 남겨야 어떤 기준이 모자란지 관리자 화면에서 바로 확인할 수 있습니다.
-  if(agent.sources.length===0||plain.length<900||headings<5)throw new Error(`콘텐츠 품질 기준을 충족하지 못해 발행하지 않았습니다. (공식 출처 ${agent.sources.length}곳/최소 1곳, 본문 ${plain.length}자/최소 900자, 소제목 ${headings}개/최소 5개)`);
+  if(agent.sources.length===0||plain.length<ARTICLE_MIN_PLAIN_LENGTH||headings<ARTICLE_MIN_HEADINGS)throw new Error(`콘텐츠 품질 기준을 충족하지 못해 발행하지 않았습니다. (공식 출처 ${agent.sources.length}곳/최소 1곳, 본문 ${plain.length}자/최소 ${ARTICLE_MIN_PLAIN_LENGTH}자, 소제목 ${headings}개/최소 ${ARTICLE_MIN_HEADINGS}개)`);
   return body;
 }
 
@@ -460,8 +479,10 @@ export async function runContentAgent(id:string){
   if(agent.status!=="active")throw new Error("일시정지된 에이전트입니다.");
   const topic=agent.topics[agent.topicCursor%agent.topics.length]??`${agent.category} 업데이트`;
   const body=buildAgentArticleBody(agent,topic);
+  // 읽는 시간은 실제 본문 분량에서 계산합니다. 한국어 기준 분당 약 500자.
+  const readingMinutes=Math.max(3,Math.round(body.replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim().length/500));
   const now=new Date();
-  const post=await createPost({title:topic,slug:`${topic.trim().toLowerCase().replace(/[^a-z0-9가-힣]+/g,"-").replace(/^-|-$/g,"")}-${Date.now().toString(36)}`,excerpt:`${agent.mission} 공식 원문, 적용 사례, 비교표와 실행 체크리스트를 함께 정리했습니다.`,body,category:agent.category,tags:[agent.name,"공식 자료","사례·체크리스트","정책 검토 대기"],status:"draft",publishedAt:"",scheduledAt:null,readingMinutes:8,visual:"REVIEW",authorName:agent.name});
+  const post=await createPost({title:topic,slug:`${topic.trim().toLowerCase().replace(/[^a-z0-9가-힣]+/g,"-").replace(/^-|-$/g,"")}-${Date.now().toString(36)}`,excerpt:`${agent.mission} 공식 원문, 적용 사례, 비교표와 실행 체크리스트를 함께 정리했습니다.`,body,category:agent.category,tags:[agent.name,"공식 자료","사례·체크리스트","정책 검토 대기"],status:"draft",publishedAt:"",scheduledAt:null,readingMinutes,visual:"REVIEW",authorName:agent.name});
   const next=new Date(now.getTime()+agent.cadenceHours*60*60*1000).toISOString();
   await d1.batch([
     d1.prepare("INSERT INTO posting_queue (post_id,status,source_url,scheduled_at) VALUES (?,?,?,NULL)").bind(post.id,"review",agent.sources[0]?.url??null),

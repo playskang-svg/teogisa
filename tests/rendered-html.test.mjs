@@ -596,5 +596,54 @@ test("keeps the organization automation scheduler running without an external cr
   assert.match(repository, /AGENT_RETRY_BACKOFF_MINUTES=60/);
   assert.match(repository, /UPDATE content_agents SET next_run_at=\?,updated_at=CURRENT_TIMESTAMP WHERE id=\?/);
   // 품질 게이트 실패 사유는 어떤 기준이 모자란지 수치로 남겨야 합니다.
-  assert.match(repository, /본문 \$\{plain\.length\}자\/최소 900자/);
+  assert.match(repository, /본문 \$\{plain\.length\}자\/최소 \$\{ARTICLE_MIN_PLAIN_LENGTH\}자/);
+});
+
+test("generates review drafts that clear the 1500-character quality bar in every category", async () => {
+  const [playbook, repository, css] = await Promise.all([
+    readFile(new URL("../lib/agent-article-playbook.ts", import.meta.url), "utf8"),
+    readFile(new URL("../lib/repository.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(repository, /ARTICLE_MIN_PLAIN_LENGTH=1500/);
+  assert.match(repository, /plain\.length<ARTICLE_MIN_PLAIN_LENGTH/);
+
+  // 모든 에이전트 분야에 고유한 집필 지침이 있어야 형식만 채운 글이 나오지 않습니다.
+  for (const category of ["실제 수익실험", "정부지원·세무", "유용한 도구", "지역 생활정보", "건강·예방", "영상 큐레이션"]) {
+    assert.ok(playbook.includes(`"${category}": {`), `${category} 집필 지침이 없습니다.`);
+  }
+  for (const section of ["summary:", "scenario:", "steps:", "terms:", "mistakes:", "faq:", "caution:"]) {
+    assert.ok(playbook.includes(section), `${section} 항목이 없습니다.`);
+  }
+  assert.match(playbook, /DEFAULT_ARTICLE_PLAYBOOK/);
+
+  // 본문이 분야별 지침을 실제로 사용해야 합니다.
+  for (const part of ["playbook.summary", "playbook.steps", "playbook.terms", "playbook.mistakes", "playbook.faq", "playbook.caution"]) {
+    assert.ok(repository.includes(part), `${part}를 본문에서 사용하지 않습니다.`);
+  }
+  assert.match(repository, /함께 확인하면 좋은 질문/);
+  assert.match(repository, /자주 묻는 질문/);
+  assert.match(repository, /헷갈리기 쉬운 용어/);
+
+  // 읽는 시간은 실제 분량에서 계산해야 합니다.
+  assert.match(repository, /const readingMinutes=Math\.max\(3,Math\.round\(/);
+  assert.doesNotMatch(repository, /readingMinutes:8/);
+
+  // 이름마다 조사가 달라지므로 하드코딩하면 안 됩니다.
+  assert.match(playbook, /withObjectParticle/);
+  assert.doesNotMatch(repository, /htmlEscape\(agent\.name\)\}이 /);
+  assert.match(css, /\.article-desk-note\{/);
+});
+
+test("computes Korean object particles from the syllable's final consonant", async () => {
+  const playbook = await readFile(new URL("../lib/agent-article-playbook.ts", import.meta.url), "utf8");
+  const source = playbook.slice(playbook.indexOf("export function withObjectParticle"));
+  const body = source.slice(source.indexOf("{") + 1, source.indexOf("\n}"));
+  const withObjectParticle = new Function("word", body);
+  assert.equal(withObjectParticle("확인 순서"), "확인 순서를");
+  assert.equal(withObjectParticle("영상 검증"), "영상 검증을");
+  assert.equal(withObjectParticle("체크리스트"), "체크리스트를");
+  assert.equal(withObjectParticle("나누는 법"), "나누는 법을");
+  assert.equal(withObjectParticle("workbook"), "workbook");
 });
