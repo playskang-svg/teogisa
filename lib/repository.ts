@@ -39,6 +39,37 @@ export function getPgClient() {
   return null;
 }
 
+/**
+ * 연결 실패 원인을 한 번에 알아보기 위해 접속 대상을 비밀번호 없이 요약합니다.
+ * 값이 비었는지, 형식이 깨졌는지, 자리표시자가 남았는지, 호스트·사용자가 맞는지가
+ * 모두 다른 원인인데 드라이버 오류만으로는 구분되지 않습니다.
+ */
+export function describeDatabaseTarget() {
+  const url = process.env.DATABASE_URL;
+  if (!url) return "DATABASE_URL 이 비어 있습니다";
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return "DATABASE_URL 형식이 올바르지 않습니다 (postgresql://사용자:비밀번호@호스트:포트/DB 형태여야 합니다)";
+  }
+  const password = decodeURIComponent(parsed.password);
+  const notes: string[] = [];
+  if (!password) notes.push("비밀번호 없음");
+  // Supabase 가 준 예시 문자열을 그대로 붙여넣으면 자리표시자가 남습니다.
+  if (/^\[.*\]$/.test(password)) notes.push("비밀번호가 자리표시자([...])입니다");
+  if (password !== password.trim()) notes.push("비밀번호 앞뒤에 공백이 있습니다");
+  if (parsed.port === "5432" && parsed.hostname.includes("pooler")) notes.push("pooler 인데 포트가 5432 입니다(트랜잭션 모드는 6543)");
+  return [
+    `host=${parsed.hostname}`,
+    `port=${parsed.port || "기본값"}`,
+    `user=${decodeURIComponent(parsed.username)}`,
+    `db=${parsed.pathname.replace(/^\//, "") || "(없음)"}`,
+    `비밀번호=${password ? `${password.length}자` : "없음"}`,
+    ...notes,
+  ].join(" · ");
+}
+
 let pgAdapter: SqlDatabase | null = null;
 function sqlDatabase(): SqlDatabase {
   const client = getPgClient();
