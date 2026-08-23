@@ -21,8 +21,18 @@ export function getPgClient() {
   const url = process.env.DATABASE_URL;
   if (url) {
     if (!pgSql) {
-      // 서버리스에서는 인스턴스마다 커넥션을 잡으므로 넉넉히 두면 DB 쪽이 먼저 고갈됩니다.
-      pgSql = postgres(url, { idle_timeout: 20, max: 4, prepare: false });
+      // 드라이버는 기본적으로 SSL 을 켜지 않지만 관리형 Postgres 는 대개 요구합니다.
+      // 연결 문자열에 sslmode 가 없고 로컬이 아니면 켭니다.
+      const isLocal = /@(localhost|127\.0\.0\.1|\[::1\])[:/]/.test(url);
+      const declaresSsl = /[?&]sslmode=/.test(url);
+      pgSql = postgres(url, {
+        // 서버리스에서는 인스턴스마다 커넥션을 잡으므로 넉넉히 두면 DB 쪽이 먼저 고갈됩니다.
+        idle_timeout: 20,
+        max: 4,
+        // 트랜잭션 모드 pooler 는 프리페어드 스테이트먼트를 지원하지 않습니다.
+        prepare: false,
+        ...(isLocal || declaresSsl ? {} : { ssl: "require" as const }),
+      });
     }
     return pgSql;
   }
