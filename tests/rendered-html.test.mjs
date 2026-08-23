@@ -581,7 +581,10 @@ test("keeps the organization automation scheduler running without an external cr
   assert.match(cronRoute, /export async function GET/);
   assert.match(cronRoute, /export async function POST/);
   assert.match(vercel, /"path": "\/api\/cron"/);
-  assert.match(vercel, /"schedule": "\*\/30 \* \* \* \*"/);
+  // Vercel Hobby 는 하루 1회 cron 만 허용합니다. 더 잦은 표현식은 배포가 실패합니다.
+  assert.match(vercel, /"schedule": "0 21 \* \* \*"/);
+  const schedule = vercel.match(/"schedule": "([^"]+)"/)[1];
+  assert.doesNotMatch(schedule, /^\*\//, "분 단위 반복은 Hobby 요금제에서 배포가 거부됩니다.");
 
   // 관리자 화면에서 상태 확인과 즉시 실행이 가능해야 합니다.
   assert.match(automationRoute, /action === "run-scheduler"/);

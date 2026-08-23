@@ -14,9 +14,10 @@ const NAVER_SITE_VERIFICATION_CONTENT = "naver-site-verification: naverafe0ef742
 
 /**
  * 매 요청마다 자동화를 깨우면 실행권 검사만 하고 끝나는 호출이 트래픽만큼 쌓입니다.
- * 일부만 표본으로 깨워도 실제 트래픽에서는 몇 분 안에 밀린 작업을 따라잡습니다.
+ * 반대로 너무 드물게 깨우면 트래픽이 적은 날 자동화가 밀립니다.
+ * Vercel Hobby 는 cron 이 하루 한 번뿐이라 평소 주기는 사실상 이 경로가 결정합니다.
  */
-const WAKE_SAMPLE_RATE = 0.05;
+const WAKE_SAMPLE_RATE = 0.2;
 
 /**
  * cron 트리거만 믿으면 자동화가 멈출 수 있습니다(트리거 미등록, 요금제별 주기 제한).
