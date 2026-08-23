@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { after } from "next/server";
 import "./globals.css";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "../lib/site";
-import { runAutomationTickIfDue } from "../lib/repository";
+import { describeDatabaseTarget, runAutomationTickIfDue } from "../lib/repository";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -45,6 +45,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       console.error(JSON.stringify({
         event: "automation_tick_failed",
         message: error instanceof Error ? error.message : String(error),
+        // 드라이버 오류만으로는 설정이 비었는지 틀렸는지 구분되지 않습니다.
+        target: describeDatabaseTarget(),
       }));
     }
   });
