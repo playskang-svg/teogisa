@@ -25,6 +25,7 @@ export const editorialAuthors: EditorialAuthor[] = [
   { id: "investment-editor", name: "박여유", role: "투자·재테크 편집자", specialty: "예금, 금리, 자산배분과 투자위험 검증" },
   { id: "economy-editor", name: "서든든", role: "생활경제 편집자", specialty: "퇴직자의 생활비, 연금, 부채와 현금흐름 해설" },
   { id: "video-editor", agentId: "video-curator", name: "큐", role: "영상 큐레이터", specialty: "공식 영상의 출처·최신성·관련성 검토" },
+  { id: "ai-practice-editor", name: "최루프", role: "AI 실전활용 편집자", specialty: "AI·자동화 도구를 실제 업무와 부업 수익화에 적용하는 절차 검증" },
 ];
 
 export const allEditorialAuthors = [EDITOR_IN_CHIEF, ...editorialAuthors];
