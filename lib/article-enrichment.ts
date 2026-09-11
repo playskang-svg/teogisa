@@ -49,6 +49,12 @@ const slugResources:Record<string,{links?:Array<{label:string;url:string}>;image
     links:[{label:"원본 영상: 클로드 수익화 방법 5가지",url:"https://www.youtube.com/watch?v=qEVZ7AgB7zI"}],
     video:{title:"클로드로 당장 수익 만드는 확실한 방법 5가지",embedUrl:"https://www.youtube-nocookie.com/embed/qEVZ7AgB7zI",sourceUrl:"https://www.youtube.com/watch?v=qEVZ7AgB7zI",description:"리서치 대행, 디지털 상품, 인스타툰, 미니사이트와 웹게임까지 다섯 가지 AI 수익화 아이디어를 소개한 영상입니다. 본문은 이 아이디어들을 7일 검증 절차와 위험 관리 기준으로 재구성했습니다.",channel:"혼잡스"},
   },
+  "localhost-server-domain-dns-basics":{
+    links:[{label:"MDN — 인터넷은 어떻게 동작하는가",url:"https://developer.mozilla.org/ko/docs/Learn_web_development/Howto/Web_mechanics/How_does_the_Internet_work"},{label:"MDN — 웹서버란 무엇일까",url:"https://developer.mozilla.org/ko/docs/Learn_web_development/Howto/Web_mechanics/What_is_a_web_server"}],
+    video:{title:"바이브 코딩 후 막히는 웹 서버와 배포의 흐름 (뿌리강의 4강)",embedUrl:"https://www.youtube-nocookie.com/embed/rESpjQLptUs",sourceUrl:"https://www.youtube.com/watch?v=rESpjQLptUs",description:"서버·IP·포트·도메인·DNS부터 Nginx, Git·Docker·CI/CD, Vercel·Railway 배포, DNS·HTTPS·SSL까지 다룬 41분 강의입니다. 이 시리즈 3편은 이 중 개념·배포방법·도메인연결 부분을 부업 사이트 운영자 기준으로 재구성했습니다.",channel:"양실장의 바이브코딩대학"},
+  },
+  "website-deploy-vercel-railway-guide":{links:[{label:"GitHub Actions 공식 문서",url:"https://docs.github.com/actions"},{label:"원본 강의: 바이브코딩 후 막히는 배포의 흐름",url:"https://www.youtube.com/watch?v=rESpjQLptUs"}]},
+  "domain-dns-ssl-connect-guide":{links:[{label:"Vercel 공식 — 도메인 연결 방법",url:"https://vercel.com/docs/domains/working-with-domains"},{label:"Let's Encrypt 공식 사이트",url:"https://letsencrypt.org/"}]},
   "unemployment-benefit-eight-steps":{links:[{label:"고용24 실업급여 신청 절차 원문",url:"https://www.work24.go.kr/cm/c/f/1100/selecSystInfo.do?systClId=SC00000254&systId=SI00000411"}]},
   "side-jobs-while-receiving-benefits":{links:[{label:"고용24 실업인정·취업 사실 신고 안내",url:"https://www.work24.go.kr/cm/c/f/1100/selecSystInfo.do?systClId=SC00000254&systId=SI00000411"}]},
   "2026-unemployment-credit-guide":{
