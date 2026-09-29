@@ -3,16 +3,16 @@
   "label": "애드블스 허브",
   "domain": "adbles.com",
   "repo": "psaksg-debug/teogisa",
-  "scannedAt": "2026-09-27T04:55:07.401Z",
+  "scannedAt": "2026-09-29T05:56:22.952Z",
   "pagesCrawled": 91,
   "sitemapUrls": 80,
   "externalChecked": 108,
   "summary": {
     "high": 11,
-    "medium": 11,
-    "low": 2
+    "medium": 3,
+    "low": 40
   },
-  "occurrences": 24,
+  "occurrences": 54,
   "findings": [
     {
       "severity": "high",
@@ -100,46 +100,6 @@
     {
       "severity": "medium",
       "kind": "dead-external-link",
-      "page": "https://adbles.com/official-info",
-      "href": "https://www.nts.go.kr",
-      "status": 400,
-      "refs": 25,
-      "text": "국세청 공식 사이트 ↗",
-      "note": "외부 링크가 죽었다. 대체 출처를 찾거나 링크를 걷어낸다"
-    },
-    {
-      "severity": "medium",
-      "kind": "dead-external-link",
-      "page": "https://adbles.com/posts/earned-income-tax-credit-semiannual-2026",
-      "href": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2453&amp;cntntsId=7784",
-      "status": 400,
-      "refs": 1,
-      "text": "국세청 근로·자녀장려금 심사 및 지급 안내",
-      "note": "외부 링크가 죽었다. 대체 출처를 찾거나 링크를 걷어낸다"
-    },
-    {
-      "severity": "medium",
-      "kind": "dead-external-link",
-      "page": "https://adbles.com/posts/earned-income-tax-credit-semiannual-2026",
-      "href": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2453&cntntsId=7784",
-      "status": 400,
-      "refs": 1,
-      "text": "국세청 근로·자녀장려금 심사 및 지급 안내 ↗",
-      "note": "외부 링크가 죽었다. 대체 출처를 찾거나 링크를 걷어낸다"
-    },
-    {
-      "severity": "medium",
-      "kind": "dead-external-link",
-      "page": "https://adbles.com/posts/affiliate-info-site-real-case",
-      "href": "https://www.law.go.kr/%ED%96%89%EC%A0%95%EA%B7%9C%EC%B9%99/%EC%B6%94%EC%B2%9C%C2%B7%EB%B3%B4%EC%A6%9D%EB%93%B1%EC%97%90%EA%B4%80%ED%95%9C%ED%91%9C%EC%8B%9C%C2%B7%EA%B4%91%EA%B3%A0%EC%8B%AC%EC%82%AC%EC%A7%80%EC%B9%A8",
-      "status": 404,
-      "refs": 2,
-      "text": "국가법령정보센터의 추천·보증 등에 관한 표시·광고 심사지침 원문",
-      "note": "외부 링크가 죽었다. 대체 출처를 찾거나 링크를 걷어낸다"
-    },
-    {
-      "severity": "medium",
-      "kind": "dead-external-link",
       "page": "https://adbles.com/posts/midlife-startup-support-programs",
       "href": "https://www.k-startup.go.kr",
       "status": 400,
@@ -158,46 +118,6 @@
       "note": "외부 링크가 죽었다. 대체 출처를 찾거나 링크를 걷어낸다"
     },
     {
-      "severity": "medium",
-      "kind": "dead-external-link",
-      "page": "https://adbles.com/posts/voluntary-resignation-unemployment-benefit-conditions",
-      "href": "https://www.law.go.kr/lsBylInfoPLinkR.do?bylCls=BE&lsNm=%EA%B3%A0%EC%9A%A9%EB%B3%B4%ED%97%98%EB%B2%95+%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99&bylNo=0002&bylBrNo=00",
-      "status": 404,
-      "refs": 1,
-      "text": "law.go.kr 공식자료 ↗",
-      "note": "외부 링크가 죽었다. 대체 출처를 찾거나 링크를 걷어낸다"
-    },
-    {
-      "severity": "medium",
-      "kind": "dead-external-link",
-      "page": "https://adbles.com/posts/retirement-pay-irp-five-checks-before-withdrawal",
-      "href": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7888&mi=6609",
-      "status": 400,
-      "refs": 2,
-      "text": "국세청 연금계좌 원천징수세율",
-      "note": "외부 링크가 죽었다. 대체 출처를 찾거나 링크를 걷어낸다"
-    },
-    {
-      "severity": "medium",
-      "kind": "dead-external-link",
-      "page": "https://adbles.com/posts/retirement-pay-irp-five-checks-before-withdrawal",
-      "href": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7880&mi=6444",
-      "status": 400,
-      "refs": 2,
-      "text": "국세청 퇴직소득세·과세이연 안내",
-      "note": "외부 링크가 죽었다. 대체 출처를 찾거나 링크를 걷어낸다"
-    },
-    {
-      "severity": "medium",
-      "kind": "dead-external-link",
-      "page": "https://adbles.com/posts/side-income-tax-records",
-      "href": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=238978",
-      "status": 400,
-      "refs": 2,
-      "text": "국세청 3.3% 원천징수 안내",
-      "note": "외부 링크가 죽었다. 대체 출처를 찾거나 링크를 걷어낸다"
-    },
-    {
       "severity": "low",
       "kind": "external-unreachable",
       "page": "https://adbles.com/official-info",
@@ -209,8 +129,350 @@
     {
       "severity": "low",
       "kind": "external-unreachable",
+      "page": "https://adbles.com/official-info",
+      "href": "https://www.gov.kr/portal/rcvfvrSvc/main/nonLogin",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/official-info",
+      "href": "https://www.bokjiro.go.kr",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/official-info",
+      "href": "https://www.nts.go.kr",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/official-info",
+      "href": "https://taxlaw.nts.go.kr",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/official-info",
+      "href": "https://www.hometax.go.kr",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/official-info",
+      "href": "https://www.moel.go.kr",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/official-info",
+      "href": "https://health.kdca.go.kr",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/health",
+      "href": "https://www.mentalhealth.go.kr",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/health",
+      "href": "https://www.mohw.go.kr/gallery.es?act=view&b_list=12&bid=0015&cg_code=&keyField=&list_no=380090&mid=a10314000000&nPage=1&orderby=&vlist_no_npage=3",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/earned-income-tax-credit-semiannual-2026",
+      "href": "https://hometax.go.kr",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/earned-income-tax-credit-semiannual-2026",
+      "href": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2453&amp;cntntsId=7784",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/earned-income-tax-credit-semiannual-2026",
+      "href": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2453&cntntsId=7784",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/earned-income-tax-credit-semiannual-2026",
+      "href": "https://call.nts.go.kr/call/qna/selectQnaInfo.do?mi=13042",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/earned-income-tax-credit-semiannual-2026",
+      "href": "https://www.korea.kr/news/policyNewsView.do?newsId=148963769",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/severance-pay-payment-rules-irp-transfer",
+      "href": "https://www.easylaw.go.kr/CSP/CnpClsMain.laf?popMenu=ov&csmSeq=999&ccfNo=4&cciNo=1&cnpClsNo=2",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/severance-pay-payment-rules-irp-transfer",
+      "href": "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202504150450592210231",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/2026-national-checkup-lung-function-test",
+      "href": "https://www.mohw.go.kr/board.es?mid=a10503010200&bid=0027&act=view&list_no=1487450",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/affiliate-info-site-real-case",
+      "href": "https://www.law.go.kr/%ED%96%89%EC%A0%95%EA%B7%9C%EC%B9%99/%EC%B6%94%EC%B2%9C%C2%B7%EB%B3%B4%EC%A6%9D%EB%93%B1%EC%97%90%EA%B4%80%ED%95%9C%ED%91%9C%EC%8B%9C%C2%B7%EA%B4%91%EA%B3%A0%EC%8B%AC%EC%82%AC%EC%A7%80%EC%B9%A8",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/affiliate-info-site-real-case",
+      "href": "https://easylaw.go.kr/CSP/CnpClsMain.laf?popMenu=ov&amp;csmSeq=1575&amp;ccfNo=2&amp;cciNo=3&amp;cnpClsNo=1",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/senior-65-transport-and-benefits",
+      "href": "https://www.gov.kr",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/midlife-startup-support-programs",
+      "href": "https://www.bizinfo.go.kr",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
       "page": "https://adbles.com/posts/national-pension-early-vs-deferred",
       "href": "https://100lifeplan.fss.or.kr",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/retirement-pension-db-dc-difference",
+      "href": "https://www.moel.go.kr/retirementpay.do",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/basic-pension-eligibility-and-reduction",
+      "href": "https://basicpension.mohw.go.kr",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/cheonan-midlife-job-search-guide",
+      "href": "https://www.cheonan.go.kr/job.do",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/bojogeum24-government-subsidy-search-guide",
+      "href": "https://www.gov.kr/portal/rcvfvrSvc/main",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/post-retirement-health-insurance-voluntary-continuation",
+      "href": "https://easylaw.go.kr/CSP/CnpClsMain.laf?popMenu=ov&amp;csmSeq=1063&amp;ccfNo=2&amp;cciNo=1&amp;cnpClsNo=3",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/voluntary-resignation-unemployment-benefit-conditions",
+      "href": "https://www.law.go.kr/lsBylInfoPLinkR.do?bylCls=BE&lsNm=%EA%B3%A0%EC%9A%A9%EB%B3%B4%ED%97%98%EB%B2%95+%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99&bylNo=0002&bylBrNo=00",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/voluntary-resignation-unemployment-benefit-conditions",
+      "href": "https://easylaw.go.kr/CSP/CnpClsMain.laf?popMenu=ov&csmSeq=722&ccfNo=2&cciNo=3&cnpClsNo=2",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/voluntary-resignation-unemployment-benefit-conditions",
+      "href": "https://www.moel.go.kr/info/lawinfo/instruction/view.do?bbs_seq=20250800121",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/retirement-pay-irp-five-checks-before-withdrawal",
+      "href": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7888&mi=6609",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/retirement-pay-irp-five-checks-before-withdrawal",
+      "href": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7880&mi=6444",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/proshot-mobile-id-studio-photo-guide",
+      "href": "https://www.passport.go.kr/home/kor/contents.do?menuPos=32",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/proshot-mobile-id-studio-photo-guide",
+      "href": "https://passport.go.kr/home/kor/onlinePhotoVerify/index.do?menuPos=33",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/deposit-protection-100-million-retirement-money-checks",
+      "href": "https://www.fsc.go.kr/edu/news/85225",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/deposit-protection-100-million-retirement-money-checks",
+      "href": "https://www.fsc.go.kr/edu/news/85077",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/side-income-tax-records",
+      "href": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=238978",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/side-jobs-while-receiving-benefits",
+      "href": "https://easylaw.go.kr/CSP/CnpClsMain.laf?popMenu=ov&amp;csmSeq=722&amp;ccfNo=2&amp;cciNo=2&amp;cnpClsNo=2",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/posts/side-jobs-while-receiving-benefits",
+      "href": "https://easylaw.go.kr/CSP/CnpClsMain.laf?popMenu=ov&amp;csmSeq=722&amp;ccfNo=5&amp;cciNo=2&amp;cnpClsNo=2",
       "status": 0,
       "error": "fetch failed",
       "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"

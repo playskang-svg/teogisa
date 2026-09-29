@@ -3,10 +3,10 @@
   "label": "애드블스 허브",
   "domain": "adbles.com",
   "repo": "psaksg-debug/teogisa",
-  "scannedAt": "2026-09-19T04:46:38.026Z",
-  "pagesCrawled": 89,
-  "sitemapUrls": 78,
-  "externalChecked": 106,
+  "scannedAt": "2026-09-29T05:56:22.952Z",
+  "pagesCrawled": 91,
+  "sitemapUrls": 80,
+  "externalChecked": 108,
   "summary": {
     "high": 11,
     "medium": 3,
@@ -116,6 +116,15 @@
       "refs": 2,
       "text": "Stack Overflow · 좋은 질문을 하는 방법",
       "note": "외부 링크가 죽었다. 대체 출처를 찾거나 링크를 걷어낸다"
+    },
+    {
+      "severity": "low",
+      "kind": "external-unreachable",
+      "page": "https://adbles.com/official-info",
+      "href": "https://www.work24.go.kr",
+      "status": 0,
+      "error": "fetch failed",
+      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
     },
     {
       "severity": "low",
@@ -302,15 +311,6 @@
       "kind": "external-unreachable",
       "page": "https://adbles.com/posts/midlife-startup-support-programs",
       "href": "https://www.bizinfo.go.kr",
-      "status": 0,
-      "error": "fetch failed",
-      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
-    },
-    {
-      "severity": "low",
-      "kind": "external-unreachable",
-      "page": "https://adbles.com/posts/noranwoosan-mutual-aid-guide",
-      "href": "https://www.8899.or.kr",
       "status": 0,
       "error": "fetch failed",
       "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
