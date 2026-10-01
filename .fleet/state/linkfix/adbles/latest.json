@@ -3,16 +3,16 @@
   "label": "애드블스 허브",
   "domain": "adbles.com",
   "repo": "psaksg-debug/teogisa",
-  "scannedAt": "2026-09-30T05:10:48.282Z",
+  "scannedAt": "2026-10-01T05:23:56.445Z",
   "pagesCrawled": 91,
   "sitemapUrls": 80,
   "externalChecked": 108,
   "summary": {
     "high": 11,
     "medium": 11,
-    "low": 2
+    "low": 1
   },
-  "occurrences": 24,
+  "occurrences": 23,
   "findings": [
     {
       "severity": "high",
@@ -196,15 +196,6 @@
       "refs": 2,
       "text": "국세청 3.3% 원천징수 안내",
       "note": "외부 링크가 죽었다. 대체 출처를 찾거나 링크를 걷어낸다"
-    },
-    {
-      "severity": "low",
-      "kind": "external-unreachable",
-      "page": "https://adbles.com/health",
-      "href": "https://www.mentalhealth.go.kr",
-      "status": 0,
-      "error": "fetch failed",
-      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
     },
     {
       "severity": "low",
