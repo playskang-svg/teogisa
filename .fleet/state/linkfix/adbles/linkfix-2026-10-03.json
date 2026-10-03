@@ -3,16 +3,16 @@
   "label": "애드블스 허브",
   "domain": "adbles.com",
   "repo": "psaksg-debug/teogisa",
-  "scannedAt": "2026-09-17T04:33:31.202Z",
-  "pagesCrawled": 87,
-  "sitemapUrls": 76,
-  "externalChecked": 104,
+  "scannedAt": "2026-10-03T04:56:12.860Z",
+  "pagesCrawled": 91,
+  "sitemapUrls": 80,
+  "externalChecked": 108,
   "summary": {
     "high": 11,
     "medium": 11,
-    "low": 3
+    "low": 2
   },
-  "occurrences": 25,
+  "occurrences": 24,
   "findings": [
     {
       "severity": "high",
@@ -202,15 +202,6 @@
       "kind": "external-unreachable",
       "page": "https://adbles.com/official-info",
       "href": "https://www.work24.go.kr",
-      "status": 0,
-      "error": "fetch failed",
-      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
-    },
-    {
-      "severity": "low",
-      "kind": "external-unreachable",
-      "page": "https://adbles.com/health",
-      "href": "https://www.mentalhealth.go.kr",
       "status": 0,
       "error": "fetch failed",
       "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"

@@ -3,25 +3,17 @@
   "label": "애드블스 허브",
   "domain": "adbles.com",
   "repo": "psaksg-debug/teogisa",
-  "scannedAt": "2026-10-02T05:12:41.198Z",
+  "scannedAt": "2026-10-03T04:56:12.860Z",
   "pagesCrawled": 91,
   "sitemapUrls": 80,
-  "externalChecked": 107,
+  "externalChecked": 108,
   "summary": {
-    "high": 12,
+    "high": 11,
     "medium": 11,
     "low": 2
   },
-  "occurrences": 25,
+  "occurrences": 24,
   "findings": [
-    {
-      "severity": "high",
-      "kind": "page-dead",
-      "page": "https://adbles.com/posts/vibe-coding-bootcamp-11",
-      "status": 0,
-      "error": "The operation was aborted due to timeout",
-      "note": "사이트맵이나 내부 링크가 가리키는데 열리지 않는다"
-    },
     {
       "severity": "high",
       "kind": "noindex",
