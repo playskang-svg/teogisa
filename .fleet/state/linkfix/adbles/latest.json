@@ -3,16 +3,16 @@
   "label": "애드블스 허브",
   "domain": "adbles.com",
   "repo": "psaksg-debug/teogisa",
-  "scannedAt": "2026-10-06T05:59:28.874Z",
+  "scannedAt": "2026-10-07T05:29:56.094Z",
   "pagesCrawled": 91,
   "sitemapUrls": 80,
   "externalChecked": 108,
   "summary": {
     "high": 11,
-    "medium": 11,
-    "low": 2
+    "medium": 10,
+    "low": 1
   },
-  "occurrences": 24,
+  "occurrences": 22,
   "findings": [
     {
       "severity": "high",
@@ -160,16 +160,6 @@
     {
       "severity": "medium",
       "kind": "dead-external-link",
-      "page": "https://adbles.com/posts/voluntary-resignation-unemployment-benefit-conditions",
-      "href": "https://www.law.go.kr/lsBylInfoPLinkR.do?bylCls=BE&lsNm=%EA%B3%A0%EC%9A%A9%EB%B3%B4%ED%97%98%EB%B2%95+%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99&bylNo=0002&bylBrNo=00",
-      "status": 404,
-      "refs": 1,
-      "text": "law.go.kr 공식자료 ↗",
-      "note": "외부 링크가 죽었다. 대체 출처를 찾거나 링크를 걷어낸다"
-    },
-    {
-      "severity": "medium",
-      "kind": "dead-external-link",
       "page": "https://adbles.com/posts/retirement-pay-irp-five-checks-before-withdrawal",
       "href": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7888&mi=6609",
       "status": 400,
@@ -196,15 +186,6 @@
       "refs": 2,
       "text": "국세청 3.3% 원천징수 안내",
       "note": "외부 링크가 죽었다. 대체 출처를 찾거나 링크를 걷어낸다"
-    },
-    {
-      "severity": "low",
-      "kind": "external-unreachable",
-      "page": "https://adbles.com/official-info",
-      "href": "https://www.work24.go.kr",
-      "status": 0,
-      "error": "fetch failed",
-      "note": "응답없음 — 일시적일 수 있어 다음 회차에 다시 본다"
     },
     {
       "severity": "low",
