@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-export const revalidate = 0;
+export const revalidate = 3600;
 
 const LATEST_COUNT = 5; // 1 hero + 4 side
 const PER_CATEGORY = 4;

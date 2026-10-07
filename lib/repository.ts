@@ -33,7 +33,15 @@ export function getPgClient() {
   const url = process.env.DATABASE_URL;
   if (url) {
     if (!pgSql) {
-      pgSql = postgres(url, { idle_timeout: 20, max: 10 });
+      const isLocal = /@(localhost|127\.0\.0\.1|\[::1\])[:/]/.test(url);
+      const declaresSsl = /[?&]sslmode=/.test(url);
+      pgSql = postgres(url, {
+        idle_timeout: 20,
+        max: 4,
+        prepare: false,
+        connect_timeout: 2,
+        ...(isLocal || declaresSsl ? {} : { ssl: "require" as const }),
+      });
     }
     return pgSql;
   }
