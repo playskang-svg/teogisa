@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-export const revalidate = 0;
+export const revalidate = 3600;
 
 // 홈은 콘텐츠 탐색이 목적이다. 브랜드 소개와 슬로건은 /about으로 옮겼다.
 // 첫 화면에서 바로 글을 고를 수 있도록 주제 이동 → 최신 글 → 주제별 모아보기

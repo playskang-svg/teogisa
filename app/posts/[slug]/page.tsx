@@ -12,6 +12,13 @@ import { addGlossaryLinksToHtml, addOfficialOrganizationLinksToHtml, refreshOffi
 import { AI_EDITORIAL_NOTICE, authorMetaName, getEditorialAuthor } from "../../../lib/editorial-team";
 import ArticleReaderTools from "./ArticleReaderTools";
 
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const posts = await getPublishedPosts();
+  return posts.map((post) => ({ slug: post.slug }));
+}
+
 export async function generateMetadata({params}:{params:Promise<{slug:string}>}):Promise<Metadata>{const {slug}=await params;const post=await getPost(slug);if(!post)return{};const image=getThumbnailSeo(post);const author=getEditorialAuthor(post.authorName);return{title:post.title,description:post.excerpt,keywords:post.tags,authors:[{name:authorMetaName(author),url:"/author"}],alternates:{canonical:`/posts/${post.slug}`},openGraph:{type:"article",title:post.title,description:post.excerpt,url:`/posts/${post.slug}`,publishedTime:post.publishedAt,authors:[authorMetaName(author)],section:post.category,tags:post.tags,images:[{url:image.src,width:image.width,height:image.height,alt:image.alt}]},twitter:{card:"summary_large_image",title:post.title,description:post.excerpt,images:[image.src]}};}
 
 type GlossaryLink = { term: string; url: string };

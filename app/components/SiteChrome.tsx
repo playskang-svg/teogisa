@@ -3,7 +3,7 @@ import { portalMenu } from "../../lib/portal";
 import { MobileMenu } from "./MobileMenu";
 
 export function Brand() {
-  return <a className="brand" href="/" aria-label={`${SITE_NAME} 홈`}><img className="brand-logo" src="/brand-mark-v2.png" width="40" height="40" alt=""/><span className="brand-copy"><strong>{SITE_NAME}</strong><small>{SITE_TAGLINE}</small></span></a>;
+  return <a className="brand" href="/" aria-label={`${SITE_NAME} 홈`}><img className="brand-logo" src="/brand-mark-v2.png" width="40" height="40" alt={SITE_NAME}/><span className="brand-copy"><strong>{SITE_NAME}</strong><small>{SITE_TAGLINE}</small></span></a>;
 }
 
 export function PortalNav({ className="portal-nav" }:{className?:string}){
