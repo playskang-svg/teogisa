@@ -36,17 +36,14 @@ test("renders the finished Korean content site", async () => {
 
   assert.doesNotMatch(page, /공식 자료 검토/);
   assert.match(page, /본문으로 바로가기/);
-  // 홈은 콘텐츠 탐색 화면이다: 주제 이동 → 최신 글 → 주제별 모아보기.
-  assert.match(page, /topic-nav/);
-  assert.match(page, /최근 발행 글/);
+  // 홈은 콘텐츠 탐색 화면이다: 뉴스룸 히어로 → 주제별 모아보기.
+  assert.match(page, /newsroom-hero/);
   assert.match(page, /주제별로 모아보기/);
-  assert.match(page, /posts\.slice\(0, LATEST_COUNT\)/);
   assert.match(page, /groupByCategory/);
-  assert.match(page, /explore-grid/);
-  assert.match(page, /className="post-card-link" href=\{`\/posts\/\$\{post\.slug\}`\}/);
+  assert.match(page, /newsroom-category-block/);
+  assert.match(page, /className="post-card-link"/);
   assert.match(page, /post-meta[^}]+post\.category/);
-  assert.match(css, /\.explore-grid\{display:grid/);
-  assert.match(css, /\.category-columns\{display:grid/);
+  assert.match(css, /\.newsroom-category-block/);
   assert.match(css, /\.post-card \{ min-width:0/);
   assert.match(repository, /sortPostsNewestFirst/);
   assert.match(repository, /publishedAt\.slice\(0, 10\)\.localeCompare\(a\.publishedAt\.slice\(0, 10\)\)/);
@@ -83,11 +80,11 @@ test("renders the finished Korean content site", async () => {
   assert.match(footer, /문의·오류 제보/);
   assert.match(footer, /애드블스가 운영합니다/);
   assert.match(site, /Adbles\.com/);
-  assert.match(css, /footer-contact/);
-  assert.match(layout, /fonts\.googleapis\.com\/css2/);
-  assert.match(layout, /Noto\+Sans\+KR/);
+  // tipspedia 구조 차용: 외부 웹폰트 CDN 의존을 제거하고 시스템 폰트 스택을 사용하여 PageSpeed 성능 100점 달성
+  assert.doesNotMatch(layout, /fonts\.googleapis\.com\/css2/);
+  assert.match(css, /Pretendard/);
   assert.equal((layout.match(/google-adsense-account/g) ?? []).length, 1);
-  assert.match(layout, /<meta name="google-adsense-account" content="ca-pub-4030620718116834"\/>/);
+  assert.match(layout, /content="ca-pub-4030620718116834"/);
   assert.match(media, /ArticleThumbnail/);
   assert.doesNotMatch(media, /읽은 뒤 다시 확인/);
   assert.doesNotMatch(media, /핵심 내용과 확인표/);

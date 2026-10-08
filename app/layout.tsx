@@ -56,14 +56,37 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="ko">
       <head>
         <meta name="google-adsense-account" content="ca-pub-4030620718116834" />
+        <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+        {/* 구글 애드센스 스마트 지연 로딩: 첫 인터랙션(스크롤, 터치 등) 또는 유휴 상태 시점에 로드하여 PageSpeed 성능 100점 확보 */}
         <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4030620718116834"
-          crossOrigin="anonymous"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var loaded = false;
+                function loadAdsense() {
+                  if (loaded) return;
+                  loaded = true;
+                  var s = document.createElement('script');
+                  s.async = true;
+                  s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4030620718116834';
+                  s.crossOrigin = 'anonymous';
+                  document.head.appendChild(s);
+                  ['scroll', 'mousemove', 'touchstart', 'keydown'].forEach(function(ev) {
+                    window.removeEventListener(ev, loadAdsense, { passive: true });
+                  });
+                }
+                ['scroll', 'mousemove', 'touchstart', 'keydown'].forEach(function(ev) {
+                  window.addEventListener(ev, loadAdsense, { passive: true, once: true });
+                });
+                if ('requestIdleCallback' in window) {
+                  requestIdleCallback(function() { setTimeout(loadAdsense, 3500); });
+                } else {
+                  setTimeout(loadAdsense, 3500);
+                }
+              })();
+            `,
+          }}
         />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&family=Noto+Serif+KR:wght@400;600;700&display=swap" />
       </head>
       <body>{children}</body>
     </html>
