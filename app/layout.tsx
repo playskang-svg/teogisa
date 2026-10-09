@@ -51,5 +51,5 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     }
   });
 
-  return <html lang="ko"><head><meta name="google-adsense-account" content="ca-pub-4030620718116834"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&family=Noto+Serif+KR:wght@400;600;700&display=swap"/></head><body>{children}</body></html>;
+  return <html lang="ko"><head><script async src="https://www.googletagmanager.com/gtag/js?id=G-88QZEDWBT8"></script><script dangerouslySetInnerHTML={{ __html: "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-88QZEDWBT8');" }}/><meta name="google-adsense-account" content="ca-pub-4030620718116834"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&family=Noto+Serif+KR:wght@400;600;700&display=swap"/></head><body>{children}</body></html>;
 }
