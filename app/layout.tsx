@@ -51,6 +51,9 @@ export const viewport: Viewport = {
   themeColor: "#f7faf8",
 };
 
+// GA4 측정 ID는 Vercel 환경변수 NEXT_PUBLIC_GA_ID(G-XXXXXXXXXX)로 주입. 값이 없으면 스크립트를 출력하지 않는다.
+const GA_ID = /^G-[A-Z0-9]{6,}$/.test(process.env.NEXT_PUBLIC_GA_ID ?? "") ? process.env.NEXT_PUBLIC_GA_ID : "";
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko">
@@ -87,6 +90,42 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             `,
           }}
         />
+        {GA_ID ? (
+          /* GA4: 애드센스와 동일하게 첫 인터랙션 또는 유휴 시점에 지연 로드. 초기 pageview는 config 시점에 1회 전송 */
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  var id = '${GA_ID}';
+                  var loaded = false;
+                  window.dataLayer = window.dataLayer || [];
+                  window.gtag = function() { window.dataLayer.push(arguments); };
+                  window.gtag('js', new Date());
+                  window.gtag('config', id);
+                  function loadGa() {
+                    if (loaded) return;
+                    loaded = true;
+                    var s = document.createElement('script');
+                    s.async = true;
+                    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
+                    document.head.appendChild(s);
+                    ['scroll', 'mousemove', 'touchstart', 'keydown'].forEach(function(ev) {
+                      window.removeEventListener(ev, loadGa, { passive: true });
+                    });
+                  }
+                  ['scroll', 'mousemove', 'touchstart', 'keydown'].forEach(function(ev) {
+                    window.addEventListener(ev, loadGa, { passive: true, once: true });
+                  });
+                  if ('requestIdleCallback' in window) {
+                    requestIdleCallback(function() { setTimeout(loadGa, 3500); });
+                  } else {
+                    setTimeout(loadGa, 3500);
+                  }
+                })();
+              `,
+            }}
+          />
+        ) : null}
       </head>
       <body>{children}</body>
     </html>
