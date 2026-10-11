@@ -51,8 +51,9 @@ export const viewport: Viewport = {
   themeColor: "#f7faf8",
 };
 
-// GA4 측정 ID는 Vercel 환경변수 NEXT_PUBLIC_GA_ID(G-XXXXXXXXXX)로 주입. 값이 없으면 스크립트를 출력하지 않는다.
-const GA_ID = /^G-[A-Z0-9]{6,}$/.test(process.env.NEXT_PUBLIC_GA_ID ?? "") ? process.env.NEXT_PUBLIC_GA_ID : "";
+// GA4 측정 ID는 환경변수 NEXT_PUBLIC_GA_ID 우선 사용, 미설정 시 adbles.com 기본 측정 ID(G-88QZEDWBT8) 적용
+const rawGaId = process.env.NEXT_PUBLIC_GA_ID ?? "G-88QZEDWBT8";
+const GA_ID = /^G-[A-Z0-9]{6,}$/.test(rawGaId) ? rawGaId : "";
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
