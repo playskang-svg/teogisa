@@ -151,6 +151,101 @@ export const seedPosts: Post[] = [
 <h2>3. 건강검진 전후 5가지 주의사항</h2>
 <ol><li><strong>검진 8시간 전 금식:</strong> 검사 전날 저녁 9시 이후 금식하며, 수분 섭취도 최소화합니다.</li><li><strong>기저질환 약물 복용 확인:</strong> 고혈압 약은 검진 당일 아침 일찍 소량의 물과 복용하되, 당뇨약/인슐린은 저혈당 예방을 위해 복용을 금합니다.</li><li><strong>추가 선택 검사 꼭 필요한 것만:</strong> 뇌 MRI, PET-CT 등 고가 검사는 증상이나 가족력이 있을 때 전문의 상담 후 선택합니다.</li><li><strong>검진 결과표 이상 소견 재검진:</strong> 2차 검진 대상(고혈압·당뇨 의심) 통보 시 기한 내 지정 병원에서 무료 재검사를 받습니다.</li><li><strong>결과 기록 모바일 통합 관리:</strong> 공단 'The 건강보험' 앱을 통해 과거 검진 이력을 통합 관리하세요.</li></ol>
 <p><strong>케어 · 건강·예방 편집자</strong></p>`, category:"건강·예방", tags:["건강검진","국가건강검진","중장년 건강","건강보험","예방의학"], status:"published", publishedAt:"2026-08-16", scheduledAt:null, readingMinutes:9, visual:"HEALTH", authorName:"케어" },
+  {
+    id: 1006,
+    title: "로컬호스트는 되는데 사이트가 안 열리는 이유 — 서버·도메인·DNS 기초",
+    slug: "localhost-server-domain-dns-basics",
+    excerpt: "부업 사이트를 만들다 '내 화면에는 보이는데 남에게는 안 보이는' 벽에 부딪힌다면, 서버·IP·포트·도메인·DNS 다섯 개념만 정리해도 절반은 풀립니다.",
+    body: `<p><strong>내 컴퓨터 화면에는 완성된 사이트가 뜨는데, 다른 사람 휴대폰에서는 아무것도 안 열린다면 코딩을 잘못한 게 아닙니다.</strong> AI 도구로 사이트를 뚝딱 만드는 것과, 그 사이트를 인터넷의 모든 사람이 볼 수 있게 만드는 것은 완전히 다른 일입니다. 후자에 필요한 것이 서버·IP주소·포트·도메인·DNS라는 다섯 개념이고, 이 글에서 순서대로 정리합니다.</p>
+<figure class="article-image"><img src="/article-thumbnails/ai-workflow.webp" alt="노트북 화면과 서버·도메인 연결 구조를 함께 살펴보는 중장년 사용자 일러스트"><figcaption>부업 사이트를 직접 운영하려면 코딩보다 먼저 서버·도메인·DNS가 어떻게 연결되는지부터 알아야 합니다. · 퇴.기.사 제작 일러스트</figcaption></figure>
+<h2>1. 왜 내 컴퓨터에서만 보일까: 로컬호스트의 정체</h2>
+<p>사이트를 만들면 보통 내 컴퓨터 안에서 먼저 실행해 확인합니다. 이때 주소창에 뜨는 <code>localhost</code>나 <code>127.0.0.1</code>은 "내 컴퓨터 자기 자신"을 가리키는 특수 주소입니다. 친구가 같은 주소를 자기 휴대폰에 입력해도 그 사람의 컴퓨터 자신을 가리킬 뿐, 내 컴퓨터로는 절대 연결되지 않습니다. 남에게 보이려면 <strong>24시간 켜져 있고 인터넷에 연결된 다른 컴퓨터</strong>, 즉 서버에 사이트를 옮겨야 합니다.</p>
+<h2>2. 서버·IP주소·포트: 이 셋의 관계부터 정리합니다</h2>
+<p>서버는 특별한 기계가 아니라 <strong>항상 켜져 있고 인터넷에 연결된 컴퓨터</strong>일 뿐입니다. 그 컴퓨터를 인터넷에서 찾으려면 번지수가 필요한데 그것이 <strong>IP주소</strong>입니다(예: 123.45.67.89). 그런데 서버 한 대 안에서도 웹사이트, 이메일, 파일전송처럼 여러 서비스가 동시에 돌 수 있어서, 그중 어떤 서비스로 들어갈지 구분하는 문 번호가 <strong>포트</strong>입니다. 웹사이트는 보통 80번(HTTP)이나 443번(HTTPS) 포트를 씁니다.</p>
+<table><thead><tr><th>용어</th><th>비유</th><th>실제 역할</th></tr></thead><tbody><tr><td>서버</td><td>24시간 문 여는 건물</td><td>사이트 파일을 담아두고 요청에 응답하는 컴퓨터</td></tr><tr><td>IP주소</td><td>건물의 번지수</td><td>그 서버를 인터넷에서 찾는 숫자 주소</td></tr><tr><td>포트</td><td>건물 안의 몇 번째 문</td><td>같은 서버 안 여러 서비스 중 하나를 지정</td></tr></tbody></table>
+<h2>3. 숫자 대신 이름을 쓰는 이유: 도메인과 DNS</h2>
+<p>IP주소는 숫자라 외우기 어렵습니다. 그래서 사람이 기억하기 쉬운 이름, 즉 <strong>도메인</strong>(예: adbles.com)을 등록기관에서 구매해 씁니다. 문제는 인터넷은 결국 IP주소로만 통신한다는 점입니다. 이 둘을 이어주는 것이 <strong>DNS(Domain Name System)</strong>이며, 브라우저에 도메인을 입력하면 DNS가 "이 이름은 어느 IP주소냐"를 찾아 알려주는 일종의 전화번호부 역할을 합니다. <a href="https://developer.mozilla.org/ko/docs/Learn_web_development/Howto/Web_mechanics/How_does_the_Internet_work" target="_blank" rel="noreferrer">MDN의 설명</a>대로, DNS를 거치지 않으면 브라우저는 어디로 요청을 보내야 할지조차 알 수 없습니다.</p>
+<h2>4. 가만히 있는 사이트 vs 계산이 필요한 사이트: 웹서버와 WAS</h2>
+<p>이미 만들어둔 페이지를 그대로 보여주기만 하면 되는 사이트(소개 페이지, 블로그 글)는 <strong>웹서버</strong> 하나로 충분합니다. 자판기처럼 정해진 상품을 그대로 내주는 구조입니다. 반면 로그인, 검색, 결제처럼 요청마다 다른 계산이 필요한 사이트는 <strong>WAS(Web Application Server)</strong>가 함께 있어야 합니다. 주문을 듣고 그때그때 만들어주는 바리스타에 가깝습니다. <a href="https://developer.mozilla.org/ko/docs/Learn_web_development/Howto/Web_mechanics/What_is_a_web_server" target="_blank" rel="noreferrer">MDN이 설명하는 웹서버의 역할</a>도 이 기본 구조를 다룹니다. 방문자가 갑자기 몰리면 요청을 나눠 처리하는 Nginx 같은 프로그램이 앞단에 추가되는데, 이 부분은 2편에서 실제 배포 방법과 함께 다룹니다.</p>
+<h2>5. 부업 사이트를 만들기 전, 이 순서만 기억하세요</h2>
+<ol><li>코드(또는 AI가 만든 결과물)를 서버에 올린다</li><li>서버의 IP주소를 확인한다</li><li>도메인을 구매한다</li><li>DNS에서 도메인과 IP주소를 연결한다</li><li>웹서버(필요하면 WAS까지)가 요청에 응답하도록 켜둔다</li></ol>
+<p>다섯 단계 중 1번과 5번을 대신 처리해 주는 서비스가 바로 Vercel, Netlify 같은 배포 플랫폼입니다. 코드를 GitHub에 올리기만 하면 서버 설정 없이 자동으로 켜지고 연결됩니다. 그 실제 선택법은 <a href="/posts/website-deploy-vercel-railway-guide">2편 — 웹사이트 배포 방법 비교</a>에서 이어집니다.</p>
+<p>원본 강의: <a href="https://www.youtube.com/watch?v=rESpjQLptUs" target="_blank" rel="noreferrer">바이브 코딩 후 막히는 웹 서버와 배포의 흐름 (양실장의 바이브코딩대학)</a>. 이 글은 강의 중 서버·도메인·DNS 개념 부분을 부업 사이트 운영자 눈높이로 재구성했으며, 실습 화면이나 특정 서비스의 요금·정책은 운영사 공식 페이지에서 최신 내용을 다시 확인하세요.</p>
+<p><strong>최루프 · AI 실전활용 편집자</strong></p>`,
+    category: "AI 활용",
+    tags: ["웹사이트 배포", "도메인", "DNS", "서버 기초", "바이브코딩"],
+    status: "published",
+    publishedAt: "2026-09-11",
+    scheduledAt: null,
+    readingMinutes: 9,
+    visual: "DNS",
+    authorName: "최루프",
+  },
+  {
+    id: 1007,
+    title: "웹사이트 배포 방법 비교: FTP는 옛날 얘기, Git·Vercel·Railway 뭘 써야 할까",
+    slug: "website-deploy-vercel-railway-guide",
+    excerpt: "파일을 손으로 옮기던 FTP 시대에서 GitHub에 코드만 올리면 자동으로 배포되는 지금까지, 배포 방법이 왜 이렇게 바뀌었는지와 부업 사이트에 맞는 선택 기준을 정리했습니다.",
+    body: `<p><strong>배포는 한 번 하고 끝나는 일이 아니라 사이트를 고칠 때마다 반복되는 일입니다.</strong> 그래서 "어떻게 배포하느냐"가 아니라 "매번 얼마나 손이 덜 가느냐"가 진짜 질문입니다. <a href="/posts/localhost-server-domain-dns-basics">1편에서 정리한 서버·도메인·DNS</a> 위에서, 실제로 파일을 서버까지 올리는 방법이 어떻게 바뀌어 왔는지 순서대로 봅니다.</p>
+<figure class="article-image"><img src="/article-thumbnails/ai-workflow.webp" alt="깃허브 저장소에서 클라우드 배포 플랫폼으로 코드가 자동 전달되는 과정을 보는 사용자 일러스트"><figcaption>지금은 코드를 GitHub에 올리기만 하면 배포 플랫폼이 알아서 서버에 반영합니다. · 퇴.기.사 제작 일러스트</figcaption></figure>
+<h2>1. FTP: 손으로 파일을 옮기던 방법과 그 한계</h2>
+<p>예전에는 완성된 파일을 FTP 프로그램으로 서버에 직접 업로드했습니다. 방법은 단순하지만 문제가 많았습니다. 어떤 파일을 언제 바꿨는지 기록이 안 남고, 실수로 옛 파일을 남겨두면 화면마다 버전이 달라지고, 여러 사람이 같이 작업하면 서로 덮어쓰는 사고가 났습니다.</p>
+<h2>2. Git과 GitHub: 코드에 '되돌리기 버튼'을 단 이유</h2>
+<p>Git은 코드가 바뀔 때마다 그 변경 내역을 기록하는 도구입니다. 문제가 생기면 이전 상태로 되돌릴 수 있고, 누가 무엇을 언제 바꿨는지 남습니다. GitHub은 이 기록을 인터넷에 올려 보관하고 공유하는 서비스입니다. 배포 관점에서 중요한 건, GitHub에 저장된 코드를 배포 플랫폼이 그대로 가져가 실행할 수 있다는 점입니다 — 이제 파일을 손으로 옮길 필요가 없어졌습니다.</p>
+<h2>3. Docker: '내 컴퓨터에서는 됐는데' 문제를 없앤 상자</h2>
+<p>내 컴퓨터에서는 잘 되던 사이트가 서버에만 올리면 안 되는 경우가 흔했습니다. 원인은 대부분 프로그램 버전 차이입니다. Docker는 코드와 그 코드가 필요로 하는 실행 환경을 통째로 하나의 '상자(컨테이너)'에 담습니다. 이 상자를 그대로 서버에서 열면 내 컴퓨터와 똑같은 환경이 재현되므로, "여기서는 되는데 저기서는 안 된다"는 문제 자체가 줄어듭니다.</p>
+<h2>4. GitHub Actions와 CI/CD: 사람이 배포 버튼을 누르지 않는 이유</h2>
+<p>코드를 고칠 때마다 빌드하고, 검사하고, 서버에 올리는 과정을 사람이 매번 손으로 하면 실수가 생기고 시간이 듭니다. <strong>CI/CD</strong>는 이 과정을 자동화하는 방식을 통틀어 부르는 말이고, <a href="https://docs.github.com/actions" target="_blank" rel="noreferrer">GitHub Actions</a>는 GitHub이 제공하는 자동화 도구입니다. 코드를 올리면 정해둔 절차(검사 → 빌드 → 배포)가 자동으로 실행됩니다.</p>
+<h2>5. 지금 부업 사이트는 뭘 써야 할까: 배포 플랫폼 비교</h2>
+<p>개인이 직접 서버를 사서 운영하는 방법도 있지만, 관리할 것이 많아 1인 운영에는 부담이 큽니다. 대신 GitHub과 연결하면 자동으로 배포해 주는 플랫폼을 쓰는 쪽이 현실적입니다.</p>
+<table><thead><tr><th>플랫폼</th><th>강점</th><th>확인할 점</th></tr></thead><tbody><tr><td>Vercel</td><td>Next.js 등과 궁합이 좋고 설정이 간단</td><td>무료 요금제 약관(상업적 이용 범위)을 확인</td></tr><tr><td>Netlify</td><td>정적 사이트 배포에 강함, CI/CD 내장</td><td>월간 빌드 시간 한도</td></tr><tr><td>Railway</td><td>데이터베이스 등 서버가 계속 켜져 있어야 하는 구조에 적합</td><td>사용량 기반 과금 구조</td></tr></tbody></table>
+<p>세 서비스 모두 공통점은 <strong>GitHub 저장소를 연결해두면, 코드를 올릴 때마다 자동으로 빌드하고 배포한다</strong>는 것입니다. 무료 한도와 상업적 이용 조건은 서비스가 수시로 바꾸므로, 실제로 쓰기 전에는 반드시 해당 플랫폼의 공식 요금 페이지에서 최신 조건을 확인하세요.</p>
+<h2>6. 처음이라면 이 순서로 시작하세요</h2>
+<ol><li>코드를 GitHub 저장소에 올린다</li><li>배포 플랫폼(Vercel·Netlify·Railway 등)에 GitHub 계정으로 로그인한다</li><li>배포할 저장소를 선택하면 자동으로 빌드·배포가 시작된다</li><li>플랫폼이 준 임시 주소(예: *.vercel.app)로 먼저 확인한다</li><li><a href="/posts/domain-dns-ssl-connect-guide">3편에서 다루는 방법</a>으로 내 도메인을 연결한다</li></ol>
+<p>임시 주소 단계에서 이미 사이트는 인터넷에 공개된 상태입니다. 도메인 연결은 '주소를 예쁘게 바꾸는' 단계이지 '공개를 시작하는' 단계가 아니라는 점을 알아두면 순서가 헷갈리지 않습니다.</p>
+<p>원본 강의: <a href="https://www.youtube.com/watch?v=rESpjQLptUs" target="_blank" rel="noreferrer">바이브 코딩 후 막히는 웹 서버와 배포의 흐름 (양실장의 바이브코딩대학)</a>. 이 글은 강의 속 FTP·Git·Docker·CI/CD·배포 플랫폼 설명을 부업 사이트를 처음 배포하는 사람 기준으로 재구성했습니다. 서비스별 요금·약관은 방문 시점에 다시 확인하세요.</p>
+<p><strong>최루프 · AI 실전활용 편집자</strong></p>`,
+    category: "AI 활용",
+    tags: ["웹사이트 배포", "깃허브 배포", "Vercel", "CI/CD", "바이브코딩"],
+    status: "published",
+    publishedAt: "2026-09-11",
+    scheduledAt: null,
+    readingMinutes: 9,
+    visual: "배포",
+    authorName: "최루프",
+  },
+  {
+    id: 1008,
+    title: "도메인 사이트 연결 방법: DNS 레코드부터 무료 SSL 인증서까지",
+    slug: "domain-dns-ssl-connect-guide",
+    excerpt: "도메인을 산 다음 날 사이트가 바로 안 뜬다고 당황하지 마세요. A레코드·CNAME 두 개와 전파 대기시간, 무료 SSL 자동화까지 순서대로 정리했습니다.",
+    body: `<p><strong>도메인을 결제한 직후에 주소창에 쳐봤는데 사이트가 안 뜬다고 환불부터 알아보지 마세요.</strong> 도메인 연결은 '설정 → 전파 대기 → 확인'을 순서대로 거치는 절차이고, 원래 몇 분에서 최대 몇 시간이 걸립니다. <a href="/posts/localhost-server-domain-dns-basics">1편</a>·<a href="/posts/website-deploy-vercel-railway-guide">2편</a>에서 서버와 배포 플랫폼까지 준비했다면, 마지막으로 내 도메인을 연결하는 단계입니다.</p>
+<figure class="article-image"><img src="/article-thumbnails/ai-workflow.webp" alt="도메인 관리 화면에서 DNS 레코드와 SSL 인증서 상태를 확인하는 사용자 일러스트"><figcaption>도메인 연결은 DNS 레코드를 등록한 뒤 전 세계에 정보가 퍼질 때까지 기다리는 절차입니다. · 퇴.기.사 제작 일러스트</figcaption></figure>
+<h2>1. 도메인을 사면 실제로 무슨 일이 일어나나</h2>
+<p>도메인을 구매하면 등록기관의 관리 화면에서 <strong>네임서버</strong>와 <strong>DNS 레코드</strong>를 설정할 수 있게 됩니다. 네임서버는 "이 도메인의 상세 주소 정보를 누구에게 물어봐야 하는지"를 지정하는 항목이고, DNS 레코드는 그 안에 실제로 적히는 "이 이름은 이 주소다"라는 내용입니다. Vercel 같은 배포 플랫폼에 도메인을 연결할 때도 결국 이 두 가지 중 하나를 설정하게 됩니다.</p>
+<h2>2. DNS 레코드, 이 두 개만 알아도 시작할 수 있습니다</h2>
+<table><thead><tr><th>레코드 종류</th><th>쓰는 상황</th><th>예시</th></tr></thead><tbody><tr><td>A 레코드</td><td>도메인 자체(예: adbles.com)를 서버의 IP주소로 연결</td><td>adbles.com → 76.76.21.21</td></tr><tr><td>CNAME 레코드</td><td>하위 도메인(예: www.adbles.com)을 다른 주소로 연결</td><td>www.adbles.com → cname.vercel-dns.com</td></tr></tbody></table>
+<p><a href="https://vercel.com/docs/domains/working-with-domains" target="_blank" rel="noreferrer">Vercel 공식 문서</a>에 따르면 A 레코드는 루트 도메인을 플랫폼이 지정한 IP로, CNAME은 www 같은 하위 도메인을 플랫폼 주소로 연결하는 데 씁니다. 입력할 때는 유형·이름·값 세 칸을 정확히 맞추는 것이 핵심이며, 오타 하나로 전체가 연결되지 않는 경우가 가장 흔합니다.</p>
+<h2>3. 설정했는데 왜 바로 안 열릴까: DNS 전파와 TTL</h2>
+<p>DNS 레코드를 저장했다고 전 세계 모든 곳에서 즉시 반영되는 것은 아닙니다. 각 정보에는 <strong>TTL(Time To Live)</strong>이라는 유효시간이 있고, 이 시간 동안은 예전 정보가 캐시(임시 저장)되어 남아있을 수 있습니다. 보통 몇 분에서 몇 시간이면 퍼지지만, 최대 48시간까지 걸릴 수 있다고 안내하는 등록기관도 있습니다. 이 시간 동안은 됐다 안됐다 하는 것처럼 보일 수 있으니, 설정 직후라면 우선 배포 플랫폼이 준 임시 주소로 정상 작동을 먼저 확인하세요.</p>
+<h2>4. HTTP와 HTTPS, 그리고 무료로 자동 발급되는 SSL 인증서</h2>
+<p>HTTP는 정보를 그대로 주고받는 방식이고, HTTPS는 그 정보를 암호화해서 중간에 가로채도 내용을 알아볼 수 없게 만든 방식입니다. 지금은 브라우저가 HTTPS가 아닌 사이트에 '안전하지 않음' 표시를 띄우므로 사실상 필수입니다. 예전에는 SSL 인증서를 직접 구매하고 주기적으로 갱신해야 했지만, <a href="https://letsencrypt.org/" target="_blank" rel="noreferrer">Let's Encrypt</a> 같은 무료 인증기관이 등장하면서 Vercel·Netlify 같은 플랫폼들이 도메인 연결 시 인증서 발급과 갱신을 자동으로 처리해 줍니다. 도메인을 연결하고 나면 별도 결제나 설정 없이 몇 분에서 몇 시간 안에 자물쇠 표시가 나타나는 것이 정상입니다.</p>
+<h2>5. 방문자가 갑자기 늘면 생기는 일</h2>
+<p>지금 당장 필요한 개념은 아니지만, 사이트가 잘돼서 방문자가 몰리면 서버 한 대로는 요청을 다 처리하지 못하는 순간이 옵니다. 이때 여러 서버로 요청을 나눠주는 장치가 <strong>로드밸런서</strong>입니다. Vercel 같은 배포 플랫폼을 쓴다면 이 부분은 플랫폼이 자동으로 처리해 주므로, 개인이 직접 서버를 운영하지 않는 이상 지금 단계에서 따로 준비할 일은 없습니다.</p>
+<h2>도메인 연결 최종 체크리스트</h2>
+<ol><li>배포 플랫폼이 요구하는 레코드 종류(A 또는 CNAME)와 값을 정확히 확인했다</li><li>등록기관 관리 화면에서 유형·이름·값을 오타 없이 입력했다</li><li>저장 직후 안 열려도 몇 시간은 전파를 기다려본다</li><li>HTTPS 자물쇠 표시가 뜨는지 확인한다</li><li>www와 www 없는 주소 중 어느 쪽으로 통일할지 정하고 나머지는 리다이렉트한다</li></ol>
+<p>세 편에 걸쳐 서버·도메인·DNS 개념(<a href="/posts/localhost-server-domain-dns-basics">1편</a>)부터 배포 방법 선택(<a href="/posts/website-deploy-vercel-railway-guide">2편</a>), 도메인 연결까지 정리했습니다. 사이트를 띄우는 일 자체는 여기서 끝나지만, 그 사이트로 실제 수입을 만드는 다음 단계가 궁금하다면 <a href="/posts/ai-first-income-five-methods-seven-day-plan">AI로 첫 수익을 검증하는 5가지 방법</a>도 함께 참고하세요.</p>
+<p>원본 강의: <a href="https://www.youtube.com/watch?v=rESpjQLptUs" target="_blank" rel="noreferrer">바이브 코딩 후 막히는 웹 서버와 배포의 흐름 (양실장의 바이브코딩대학)</a>. 이 글은 강의 속 도메인·DNS·HTTPS 설명을 실제 연결 순서 기준으로 재구성했습니다. 서비스별 화면과 정책은 바뀔 수 있으므로 연결 전 배포 플랫폼과 등록기관의 공식 안내를 다시 확인하세요.</p>
+<p><strong>최루프 · AI 실전활용 편집자</strong></p>`,
+    category: "AI 활용",
+    tags: ["웹사이트 배포", "도메인 연결", "DNS 설정", "SSL 인증서", "바이브코딩"],
+    status: "published",
+    publishedAt: "2026-09-11",
+    scheduledAt: null,
+    readingMinutes: 10,
+    visual: "SSL",
+    authorName: "최루프",
+  },
 ];
 
 const contentQualityUpgrades:Record<string,Pick<Post,"excerpt"|"body"|"readingMinutes">>={
